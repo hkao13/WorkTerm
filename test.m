@@ -22,7 +22,7 @@ function varargout = test(varargin)
 
 % Edit the above text to modify the response to help test
 
-% Last Modified by GUIDE v2.5 23-Jan-2014 13:48:52
+% Last Modified by GUIDE v2.5 24-Jan-2014 10:09:05
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -77,33 +77,17 @@ function plot_button_Callback(hObject, eventdata, handles)
 % hObject    handle to plot_button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+axes(handles.axes2);
+cla;
 time = handles.time;
 potential = handles.root;
 threshold = str2double(get(handles.thresh_edit, 'String'));
-spike = str2double(get(handles.spike_thresh_edit, 'String'));
-trough = str2double(get(handles.trough_thresh_edit, 'String'));
-burst = str2double(get(handles.burst_thresh_edit, 'String'));
-axes(handles.axes2);
 sp = signalprocess(time, potential, threshold);
 sp.downSample(5);
 sp.bandpass;
 sp.filterData;
-if (isnan(threshold))
-    sp.plotData;
-else
-    sp.aboveThreshold;
-    sp.isBurst(spike, trough, burst);
-    sp.plotData;
-    sp.plotTest;
-    sp.averageDuration;
-    sp.averagePeriod;
-    sp.averageAmplitude;
-    sp.plotAvgAmp;
-    set(handles.avg_dur_edit, 'String', sp.average_burst_duration);
-    set(handles.avg_per_edit, 'String', sp.average_burst_period);
-    set(handles.avg_amp_edit, 'String', sp.average_amplitude);
-end
+sp.plotData;
+
 
 function thresh_edit_Callback(hObject, eventdata, handles)
 % hObject    handle to thresh_edit (see GCBO)
@@ -277,9 +261,16 @@ function cursor_button_Callback(hObject, eventdata, handles)
 % hObject    handle to cursor_button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
 [x, y, button] = ginput(1);
+
 if (button == 1)
-    set(handles.thresh_edit,'String', y);
+    del_items = findobj(gca, 'Color', 'red', '-or', 'Color', 'blue' ,...
+        '-or', 'Color', 'green', '-or', 'Marker', '>', '-or',...
+        'Marker', '<');
+    delete(del_items);
+    
+    set(handles.thresh_edit, 'String', y);
     time = handles.time;
     potential = handles.root;
     threshold = str2double(get(handles.thresh_edit, 'String'));
@@ -291,22 +282,21 @@ if (button == 1)
     sp.downSample(5);
     sp.bandpass;
     sp.filterData;
-    if (isnan(threshold))
-        sp.plotData;
-    else
-        sp.aboveThreshold;
-        sp.isBurst(spike, trough, burst);
-        sp.plotData;
-        sp.plotTest;
-        sp.averageDuration;
-        sp.averagePeriod;
-        sp.averageAmplitude;
-        sp.plotAvgAmp;
-        set(handles.avg_dur_edit, 'String', sp.average_burst_duration);
-        set(handles.avg_per_edit, 'String', sp.average_burst_period);
-        set(handles.avg_amp_edit, 'String', sp.average_amplitude);
-    end
+    sp.aboveThreshold;
+    sp.isBurst(spike, trough, burst);
+    sp.averageDuration;
+    sp.averagePeriod;
+    sp.averageAmplitude;
+    sp.plotMarker;
+    sp.plotAvgAmp;
+    set(handles.avg_dur_edit, 'String', sp.average_burst_duration);
+    set(handles.avg_per_edit, 'String', sp.average_burst_period);
+    set(handles.avg_amp_edit, 'String', sp.average_amplitude);
+    
+    %objs = get(gca, 'Children');
+    %set(handles.test_edit, 'String', numel(objs));
     cursor_button_Callback(hObject, eventdata, handles);
+
 end
 
 
@@ -413,4 +403,41 @@ function path_file_edit_CreateFcn(hObject, eventdata, handles)
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in set_button.
+function set_button_Callback(hObject, eventdata, handles)
+% hObject    handle to set_button (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+threshold = str2double(get(handles.thresh_edit, 'String'));
+if ( isnan(threshold) )
+    set(handles.thresh_edit, 'String', 'Please enter a value.')
+else
+    del_items = findobj(gca, 'Color', 'red', '-or', 'Color', 'blue' ,...
+        '-or', 'Color', 'green', '-or', 'Marker', '>', '-or',...
+        'Marker', '<');
+    delete(del_items);
+    
+    time = handles.time;
+    potential = handles.root;
+    spike = str2double(get(handles.spike_thresh_edit, 'String'));
+    trough = str2double(get(handles.trough_thresh_edit, 'String'));
+    burst = str2double(get(handles.burst_thresh_edit, 'String'));
+    axes(handles.axes2);
+    sp = signalprocess(time, potential, threshold);
+    sp.downSample(5);
+    sp.bandpass;
+    sp.filterData;
+    sp.aboveThreshold;
+    sp.isBurst(spike, trough, burst);
+    sp.averageDuration;
+    sp.averagePeriod;
+    sp.averageAmplitude;
+    sp.plotMarker;
+    sp.plotAvgAmp;
+    set(handles.avg_dur_edit, 'String', sp.average_burst_duration);
+    set(handles.avg_per_edit, 'String', sp.average_burst_period);
+    set(handles.avg_amp_edit, 'String', sp.average_amplitude);
 end

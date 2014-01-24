@@ -1,7 +1,7 @@
 classdef signalprocess < handle
     %UNTITLED Summary of this class goes here
     %   Detailed explanation goes here
-    
+   
     properties (GetAccess = private, SetAccess = private)
         time        %time
         potential   %potential
@@ -83,30 +83,29 @@ classdef signalprocess < handle
         % function to plot time vs. the filtered, rectified, and averaged
         % data.
         function plotData (SP)
-            
-            plot (SP.time_downsample, SP.avg_abs_filt_poten)
+            hold on;
+            plot (SP.time_downsample, SP.avg_abs_filt_poten, 'Color', 'k')
             xlabel('Time (s)');
             ylabel('Voltage (mV)');
+            hold off;
         end
         
-        function plotTest (SP)
-            
+        function plotMarker (SP)
             hold on;
             refline(0, SP.threshold);
-            plot (SP.time_downsample(SP.onset_revised), SP.threshold,...
+            plot(SP.time_downsample(SP.onset_revised), SP.threshold,...
                 '>', 'MarkerSize', 8, 'MarkerEdgeColor',...
                 'g', 'MarkerFaceColor', 'g');
-            plot (SP.time_downsample(SP.offset_revised), SP.threshold,...
+             plot(SP.time_downsample(SP.offset_revised), SP.threshold,...
                 '<','MarkerSize', 8, 'MarkerEdgeColor',...
                 'r', 'MarkerFaceColor', 'r');
             hold off;
         end
-        
+                
         function plotAvgAmp (SP)
-            
             hold on;
-            hline = refline (0, SP.average_amplitude);
-            set(hline, 'Color', 'r')
+            line = refline (0, SP.average_amplitude);
+            set(line, 'Color', 'r')
             hold off;
         end
         % determines all onsets and offsets of every spike above the

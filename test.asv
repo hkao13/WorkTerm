@@ -72,6 +72,55 @@ function varargout = test_OutputFcn(hObject, eventdata, handles)
 % Get default command line output from handles structure
 varargout{1} = handles.output;
 
+
+
+function x_data_Callback(hObject, eventdata, handles)
+% hObject    handle to x_data (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of x_data as text
+%        str2double(get(hObject,'String')) returns contents of x_data as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function x_data_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to x_data (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'),...
+        get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function y_data_Callback(hObject, eventdata, handles)
+% hObject    handle to y_data (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of y_data as text
+%        str2double(get(hObject,'String')) returns contents of y_data as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function y_data_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to y_data (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'),...
+        get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
 % --- Executes on button press in plot_button.
 function plot_button_Callback(hObject, eventdata, handles)
 % hObject    handle to plot_button (see GCBO)

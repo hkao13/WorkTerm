@@ -93,8 +93,12 @@ classdef signalprocess < handle
             
             hold on;
             refline(0, SP.threshold);
-            plot (SP.time_downsample(SP.onset_revised), SP.threshold, '>', 'MarkerSize', 8, 'MarkerEdgeColor', 'g', 'MarkerFaceColor', 'g');
-            plot (SP.time_downsample(SP.offset_revised), SP.threshold, '<', 'MarkerSize', 8, 'MarkerEdgeColor', 'r', 'MarkerFaceColor', 'r');
+            plot (SP.time_downsample(SP.onset_revised), SP.threshold,...
+                '>', 'MarkerSize', 8, 'MarkerEdgeColor',...
+                'g', 'MarkerFaceColor', 'g');
+            plot (SP.time_downsample(SP.offset_revised), SP.threshold,...
+                '<','MarkerSize', 8, 'MarkerEdgeColor',...
+                'r', 'MarkerFaceColor', 'r');
             hold off;
         end
         
@@ -118,7 +122,8 @@ classdef signalprocess < handle
 
         % determines whether each spike can be considered a burst or not
         % depending on the thrsholds given.
-        function isBurst (SP, spike_threshold, trough_threshold, burst_threshold)
+        function isBurst (SP, spike_threshold, trough_threshold,...
+                burst_threshold)
             
             if (isnan(spike_threshold))
                 spike_threshold = 0.05;
@@ -139,7 +144,8 @@ classdef signalprocess < handle
             % SPIKE_THRESHOLD, adds to the [on], [off] array. 
             for i = 1:numel(SP.onset)
                 
-                if ( SP.time_downsample(SP.offset(i)) - SP.time_downsample(SP.onset(i)) > spike_threshold )
+                if ( SP.time_downsample(SP.offset(i)) -...
+                        SP.time_downsample(SP.onset(i)) > spike_threshold )
                     
                     on(i) = SP.onset(i);
                     off(i) = SP.offset(i);
@@ -155,7 +161,10 @@ classdef signalprocess < handle
             % TROUGH_THRESHOLD
             for j = 2:numel(on)
                 
-                if ( ((SP.time_downsample(on(j)) - SP.time_downsample(off(j-1))) < trough_threshold) && ( SP.time_downsample(on(j)) - SP.time_downsample(off(j-1)) > 0 ))
+                if ( ((SP.time_downsample(on(j)) -...
+                        SP.time_downsample(off(j-1))) < trough_threshold)...
+                        && ( SP.time_downsample(on(j)) -...
+                        SP.time_downsample(off(j-1)) > 0 ))
                     
                     trough_on(j) = on(j);
                     trough_off(j) = off(j-1);
@@ -180,7 +189,8 @@ classdef signalprocess < handle
             % from previous operations.
             for n = 1:numel(on)
                 
-                if ( (SP.time_downsample(off(n)) - SP.time_downsample(on(n))) < burst_threshold )
+                if ( (SP.time_downsample(off(n)) -...
+                        SP.time_downsample(on(n))) < burst_threshold )
                     
                     burst_on(n) = on(n);
                     burst_off(n) = off(n);
@@ -210,11 +220,14 @@ classdef signalprocess < handle
             
             for i = 1:numel(SP.onset_revised) 
                 
-                cumulative_burst_duration = cumulative_burst_duration + (SP.time_downsample(SP.offset_revised(i))- SP.time_downsample(SP.onset_revised(i)));
+                cumulative_burst_duration = cumulative_burst_duration +...
+                    (SP.time_downsample(SP.offset_revised(i))-...
+                    SP.time_downsample(SP.onset_revised(i)));
                 duration_count = duration_count + 1;
             end
             
-            SP.average_burst_duration = cumulative_burst_duration / duration_count;
+            SP.average_burst_duration =...
+                cumulative_burst_duration / duration_count;
         end
             
         % calculates the average period cycle of bursts. The period is
@@ -227,12 +240,15 @@ classdef signalprocess < handle
             
             for x = 1:numel(SP.onset_revised)
                 if ( x < numel(SP.onset_revised) )
-                    cumulative_burst_period = cumulative_burst_period + ( SP.time_downsample(SP.onset_revised(x+1)) - SP.time_downsample(SP.onset_revised(x)) );
+                    cumulative_burst_period = cumulative_burst_period +...
+                        ( SP.time_downsample(SP.onset_revised(x+1)) -...
+                        SP.time_downsample(SP.onset_revised(x)) );
                     period_count = period_count + 1;
                 end
             end
             
-            SP.average_burst_period = cumulative_burst_period / period_count; 
+            SP.average_burst_period =...
+                cumulative_burst_period / period_count; 
         end
         
         % caluclates the average amplitude of all bursts in the data set.
@@ -248,7 +264,8 @@ classdef signalprocess < handle
                 stop = SP.offset_revised(i);
                 
                 for j = find(SP.onset == start):find(SP.offset == stop)
-                    values = SP.avg_abs_filt_poten(SP.onset(j):SP.offset(j));
+                    values =...
+                        SP.avg_abs_filt_poten(SP.onset(j):SP.offset(j));
                 end
                 
                 peaks = max(values);
@@ -261,17 +278,20 @@ classdef signalprocess < handle
                 
         function getDuration (SP)
             
-            fprintf ('Average burst duration:\n%f s\n', SP.average_burst_duration);
+            fprintf('Average burst duration:\n%f s\n',...
+                SP.average_burst_duration);
         end
         
         function getPeriod (SP)
             
-            fprintf ('Average period of bursts:\n%f s\n', SP.average_burst_period);
+            fprintf ('Average period of bursts:\n%f s\n',...
+                SP.average_burst_period);
         end
         
         function getAmplitude (SP)
             
-            fprintf ('Average burst amplitude:\n%f mV\n', SP.average_amplitude);
+            fprintf ('Average burst amplitude:\n%f mV\n',...
+                SP.average_amplitude);
         end   
     end
 

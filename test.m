@@ -79,23 +79,16 @@ function plot_button_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 time = handles.time;
 threshold = str2double(get(handles.thresh_edit, 'String'));
-axes(handles.axes3);
-cla;
-cp = signalprocess(time, handles.cell, threshold);
-cp.downSample(0);
-cp.bandpass;
-cp.filterData;
-cp.plotData;
+
 
 axes(handles.axes2);
 cla;
 
 potential = handles.root;
-sp = signalprocess(time, potential, threshold);
-sp.downSample(0);
-sp.bandpass;
-sp.filterData;
-sp.plotData;
+ro = root(time, potential, threshold);
+ro.bandpass;
+ro.filterData;
+ro.plotData;
 
 
 function thresh_edit_Callback(hObject, eventdata, handles)
@@ -287,20 +280,19 @@ if (button == 1)
     trough = str2double(get(handles.trough_thresh_edit, 'String'));
     burst = str2double(get(handles.burst_thresh_edit, 'String'));
     axes(handles.axes2);
-    sp = signalprocess(time, potential, threshold);
-    sp.downSample(0);
-    sp.bandpass;
-    sp.filterData;
-    sp.aboveThreshold;
-    sp.isBurst(spike, trough, burst);
-    sp.averageDuration;
-    sp.averagePeriod;
-    sp.averageAmplitude;
-    sp.plotMarker;
-    sp.plotAvgAmp;
-    set(handles.avg_dur_edit, 'String', sp.average_burst_duration);
-    set(handles.avg_per_edit, 'String', sp.average_burst_period);
-    set(handles.avg_amp_edit, 'String', sp.average_amplitude);
+    ro = root(time, potential, threshold);
+    ro.bandpass;
+    ro.filterData;
+    ro.aboveThreshold;
+    ro.isBurst(spike, trough, burst);
+    ro.averageDuration;
+    ro.averagePeriod;
+    ro.averageAmplitude;
+    ro.plotMarkers;
+    ro.plotAmplitude;
+    set(handles.avg_dur_edit, 'String', ro.averageBurstDuration);
+    set(handles.avg_per_edit, 'String', ro.averageBurstPeriod);
+    set(handles.avg_amp_edit, 'String', ro.averageAmp);
     
     %objs = get(gca, 'Children');
     %set(handles.test_edit, 'String', numel(objs));
@@ -390,7 +382,7 @@ function browse_button_Callback(hObject, eventdata, handles)
 [file_name, path_name] = uigetfile({...
 '*.atf;*.abf', 'All Axon Files (*.atf. *.abf)';...
 '*.atf','Axon Text Files (*.atf)';...
-'*.abf','Axon Binary Files (*.abf)'}, 'Please select EMG data file');
+'*.abf','Axon Binary Files (*.abf)'}, 'Please select ENG data file');
 path_and_file = strcat(path_name, file_name);
 handles.path_and_file = path_and_file;
 guidata(hObject, handles);
@@ -441,20 +433,19 @@ else
     trough = str2double(get(handles.trough_thresh_edit, 'String'));
     burst = str2double(get(handles.burst_thresh_edit, 'String'));
     axes(handles.axes2);
-    sp = signalprocess(time, potential, threshold);
-    sp.downSample(0);
-    sp.bandpass;
-    sp.filterData;
-    sp.aboveThreshold;
-    sp.isBurst(spike, trough, burst);
-    sp.averageDuration;
-    sp.averagePeriod;
-    sp.averageAmplitude;
-    sp.plotMarker;
-    sp.plotAvgAmp;
-    set(handles.avg_dur_edit, 'String', sp.average_burst_duration);
-    set(handles.avg_per_edit, 'String', sp.average_burst_period);
-    set(handles.avg_amp_edit, 'String', sp.average_amplitude);
+    ro = root(time, potential, threshold);
+    ro.bandpass;
+    ro.filterData;
+    ro.aboveThreshold;
+    ro.isBurst(spike, trough, burst);
+    ro.averageDuration;
+    ro.averagePeriod;
+    ro.averageAmplitude;
+    ro.plotMarkers;
+    ro.plotAmplitude;
+    set(handles.avg_dur_edit, 'String', ro.averageBurstDuration);
+    set(handles.avg_per_edit, 'String', ro.averageBurstPeriod);
+    set(handles.avg_amp_edit, 'String', ro.averageAmp);
 end
 
 

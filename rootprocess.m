@@ -37,12 +37,12 @@ classdef rootprocess < handle
     
     methods
         
-        function SP = rootprocess (time, potential, threshold)
+        function RP = rootprocess (time, potential, threshold)
         % class constructor
             if (nargin > 0)
-                SP.time = time;
-                SP.potential = potential;
-                SP.threshold = threshold;
+                RP.time = time;
+                RP.potential = potential;
+                RP.threshold = threshold;
             end
         end
         
@@ -52,45 +52,45 @@ classdef rootprocess < handle
         %sets.
         %default downsampling factor is 5 if not downsampling factor is
         %given.
-        function downSample (SP, factor)
+        function downSample (RP, factor)
             if (factor == 0)
-                SP.time_downsample = SP.time;
-                SP.potential_downsample = SP.potential;
+                RP.time_downsample = RP.time;
+                RP.potential_downsample = RP.potential;
                 
             elseif (isnan(factor))
                 factor = 5;
-                SP.time_downsample = downsample( SP.time, factor );
-                SP.potential_downsample = downsample ( SP.potential, factor );
+                RP.time_downsample = downsample( RP.time, factor );
+                RP.potential_downsample = downsample ( RP.potential, factor );
             else
             
-                SP.time_downsample = downsample( SP.time, factor );
-                SP.potential_downsample = downsample ( SP.potential, factor );
+                RP.time_downsample = downsample( RP.time, factor );
+                RP.potential_downsample = downsample ( RP.potential, factor );
             end
         end
         
         % creates a bandpass filter
-        function bandpass (SP)
+        function bandpass (RP)
             
-            freq_norm = 2*SP.FREQ_PASS / SP.FREQ_SAMPLE;%normalized passband
-            [SP.b, SP.a] = butter(SP.FILTER_ORDER, freq_norm, 'bandpass');
+            freq_norm = 2*RP.FREQ_PASS / RP.FREQ_SAMPLE;%normalized passband
+            [RP.b, RP.a] = butter(RP.FILTER_ORDER, freq_norm, 'bandpass');
         end
         
         % filters the raw data twice, forward and reverse, doubling the
         % filtering order and removing phase shifts. Full wave
         % rectification of data, and then takes a moving average of the
         % data.
-        function filterData (SP)
+        function filterData (RP)
             
-            filt_poten = filtfilt(SP.b, SP.a, SP.potential_downsample);%filters the ENG
+            filt_poten = filtfilt(RP.b, RP.a, RP.potential_downsample);%filters the ENG
             abs_filt_poten = abs(filt_poten);%rectifies filtered ENG
-            SP.avg_abs_filt_poten = smooth(abs_filt_poten, SP.MOVING_AVG_SPAN, 'moving');
+            RP.avg_abs_filt_poten = smooth(abs_filt_poten, RP.MOVING_AVG_SPAN, 'moving');
         end
         
         % function to plot time vs. the filtered, rectified, and averaged
         % data.
-        function plotData (SP)
+        function plotData (RP)
             hold on;
-            plot (SP.time_downsample, SP.avg_abs_filt_poten, 'Color', 'k')
+            plot (RP.time_downsample, RP.avg_abs_filt_poten, 'Color', 'k')
             xlabel('Time (s)');
             ylabel('Voltage (mV)');
             hold off;
@@ -102,39 +102,39 @@ classdef rootprocess < handle
         %specified from the construtor.
         %onset markers are green > markers, offsets are red < markers.
         %threshold level is a black line
-        function plotMarker (SP)
+        function plotMarker (RP)
             hold on;
-            refline(0, SP.threshold);
-            plot(SP.time_downsample(SP.onset_revised), SP.threshold,...
+            refline(0, RP.threshold);
+            plot(RP.time_downsample(RP.onset_revised), RP.threshold,...
                 '>', 'MarkerSize', 8, 'MarkerEdgeColor',...
                 'g', 'MarkerFaceColor', 'g');
-             plot(SP.time_downsample(SP.offset_revised), SP.threshold,...
+             plot(RP.time_downsample(RP.offset_revised), RP.threshold,...
                 '<','MarkerSize', 8, 'MarkerEdgeColor',...
                 'r', 'MarkerFaceColor', 'r');
             hold off;
         end
         
         %plots the average amplitude as a horizontal red line.
-        function plotAvgAmp (SP)
+        function plotAvgAmp (RP)
             hold on;
-            line = refline (0, SP.average_amplitude);
+            line = refline (0, RP.average_amplitude);
             set(line, 'Color', 'r')
             hold off;
         end
         % determines all onsets and offsets of every spike above the
         % potential threshold level.
         
-        function aboveThreshold (SP)
+        function aboveThreshold (RP)
             
-            above_threshold = (SP.avg_abs_filt_poten > SP.threshold); 
+            above_threshold = (RP.avg_abs_filt_poten > RP.threshold); 
             edge = diff(above_threshold); %calculates difference between each index value
-            SP.onset = find(edge == 1); %(0 -> 1) difference of +1 means onset of a spike
-            SP.offset = find(edge == -1);  %(1 -> 0) difference of -1 means ofset of a spike
+            RP.onset = find(edge == 1); %(0 -> 1) difference of +1 means onset of a spike
+            RP.offset = find(edge == -1);  %(1 -> 0) difference of -1 means ofset of a spike
         end
 
         % determines whether each spike can be considered a burst or not
         % depending on the thrsholds given.
-        function isBurst (SP, spike_threshold, trough_threshold,...
+        function isBurst (RP, spike_threshold, trough_threshold,...
                 burst_threshold)
             
             if (isnan(spike_threshold))
@@ -150,17 +150,17 @@ classdef rootprocess < handle
             end
             % preallocates arrays to determine which onsets and offsets to 
             % use for calculations.
-            on = zeros(numel(SP.onset):1);
-            off = zeros(numel(SP.offset):1);
+            on = zeros(numel(RP.onset):1);
+            off = zeros(numel(RP.offset):1);
             % if a spike above the threshold lasts more than the
             % SPIKE_THRESHOLD, adds to the [on], [off] array. 
-            for i = 1:numel(SP.onset)
+            for i = 1:numel(RP.onset)
                 
-                if ( SP.time_downsample(SP.offset(i)) -...
-                        SP.time_downsample(SP.onset(i)) > spike_threshold )
+                if ( RP.time_downsample(RP.offset(i)) -...
+                        RP.time_downsample(RP.onset(i)) > spike_threshold )
                     
-                    on(i) = SP.onset(i);
-                    off(i) = SP.offset(i);
+                    on(i) = RP.onset(i);
+                    off(i) = RP.offset(i);
                 end
             end
             
@@ -173,10 +173,10 @@ classdef rootprocess < handle
             % TROUGH_THRESHOLD
             for j = 2:numel(on)
                 
-                if ( ((SP.time_downsample(on(j)) -...
-                        SP.time_downsample(off(j-1))) < trough_threshold)...
-                        && ( SP.time_downsample(on(j)) -...
-                        SP.time_downsample(off(j-1)) > 0 ))
+                if ( ((RP.time_downsample(on(j)) -...
+                        RP.time_downsample(off(j-1))) < trough_threshold)...
+                        && ( RP.time_downsample(on(j)) -...
+                        RP.time_downsample(off(j-1)) > 0 ))
                     
                     trough_on(j) = on(j);
                     trough_off(j) = off(j-1);
@@ -201,8 +201,8 @@ classdef rootprocess < handle
             % from previous operations.
             for n = 1:numel(on)
                 
-                if ( (SP.time_downsample(off(n)) -...
-                        SP.time_downsample(on(n))) < burst_threshold )
+                if ( (RP.time_downsample(off(n)) -...
+                        RP.time_downsample(on(n))) < burst_threshold )
                     
                     burst_on(n) = on(n);
                     burst_off(n) = off(n);
@@ -219,65 +219,65 @@ classdef rootprocess < handle
                 off(off == burst_off(m)) = [];
             end
             
-            SP.onset_revised = on;
-            SP.offset_revised = off;
+            RP.onset_revised = on;
+            RP.offset_revised = off;
         end
                
         % calculates the average duration of each burst. The duration of a
         % burst is measured from the onset to the offset of that burst.
-        function averageDuration (SP)
+        function averageDuration (RP)
             
             cumulative_burst_duration = 0;
             duration_count = 0;
             
-            for i = 1:numel(SP.onset_revised) 
+            for i = 1:numel(RP.onset_revised) 
                 
                 cumulative_burst_duration = cumulative_burst_duration +...
-                    (SP.time_downsample(SP.offset_revised(i))-...
-                    SP.time_downsample(SP.onset_revised(i)));
+                    (RP.time_downsample(RP.offset_revised(i))-...
+                    RP.time_downsample(RP.onset_revised(i)));
                 duration_count = duration_count + 1;
             end
             
-            SP.average_burst_duration =...
+            RP.average_burst_duration =...
                 cumulative_burst_duration / duration_count;
         end
             
         % calculates the average period cycle of bursts. The period is
         % measured from the onset of one burst to the onset of the next
         % consectutive burst.
-        function averagePeriod (SP)
+        function averagePeriod (RP)
             
             cumulative_burst_period = 0;
             period_count = 0;
             
-            for x = 1:numel(SP.onset_revised)
-                if ( x < numel(SP.onset_revised) )
+            for x = 1:numel(RP.onset_revised)
+                if ( x < numel(RP.onset_revised) )
                     cumulative_burst_period = cumulative_burst_period +...
-                        ( SP.time_downsample(SP.onset_revised(x+1)) -...
-                        SP.time_downsample(SP.onset_revised(x)) );
+                        ( RP.time_downsample(RP.onset_revised(x+1)) -...
+                        RP.time_downsample(RP.onset_revised(x)) );
                     period_count = period_count + 1;
                 end
             end
             
-            SP.average_burst_period =...
+            RP.average_burst_period =...
                 cumulative_burst_period / period_count; 
         end
         
         % caluclates the average amplitude of all bursts in the data set.
         % Determines the maximum local peaks of each burst and takes the
         % mean of all peaks.
-        function averageAmplitude (SP)
+        function averageAmplitude (RP)
             
-            max_values = zeros(numel(SP.potential_downsample):1);
+            max_values = zeros(numel(RP.potential_downsample):1);
             
-            for i = 1:numel(SP.onset_revised)
+            for i = 1:numel(RP.onset_revised)
                 
-                start = SP.onset_revised(i);
-                stop = SP.offset_revised(i);
+                start = RP.onset_revised(i);
+                stop = RP.offset_revised(i);
                 
-                for j = find(SP.onset == start):find(SP.offset == stop)
+                for j = find(RP.onset == start):find(RP.offset == stop)
                     values =...
-                        SP.avg_abs_filt_poten(SP.onset(j):SP.offset(j));
+                        RP.avg_abs_filt_poten(RP.onset(j):RP.offset(j));
                 end
                 
                 peaks = max(values);
@@ -285,25 +285,25 @@ classdef rootprocess < handle
             end
             
             max_values = max_values(max_values ~= 0);
-            SP.average_amplitude = mean(max_values);
+            RP.average_amplitude = mean(max_values);
         end
                 
-        function getDuration (SP)
+        function getDuration (RP)
             
             fprintf('Average burst duration:\n%f s\n',...
-                SP.average_burst_duration);
+                RP.average_burst_duration);
         end
         
-        function getPeriod (SP)
+        function getPeriod (RP)
             
             fprintf ('Average period of bursts:\n%f s\n',...
-                SP.average_burst_period);
+                RP.average_burst_period);
         end
         
-        function getAmplitude (SP)
+        function getAmplitude (RP)
             
             fprintf ('Average burst amplitude:\n%f mV\n',...
-                SP.average_amplitude);
+                RP.average_amplitude);
         end   
     end
 

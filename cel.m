@@ -1,57 +1,37 @@
-classdef root < signalanalysis
-    %UNTITLED4 Summary of this class goes here
+classdef cel < signalanalysis
+    %UNTITLED3 Summary of this class goes here
     %   Detailed explanation goes here
     
     properties
-        b
-        a
-    end
-    
-    properties (Constant)
-        FILTER_ORDER = 2; % order of the filter
-        FREQ_SAMPLE = 10000; % sample frequency (Hz)
-        FREQ_PASS = [100, 1000]; % passband frequency (Hz)
-        MOVING_AVG_SPAN = 501; % span of moving average (10E-4s)
     end
     
     methods
-        function RO = root(time, potential, threshold)
-            RO = RO@signalanalysis(time, potential, threshold);
+        function CE = cel(time, potential, threshold)
+            CE = CE@signalanalysis(time, potential, threshold);
         end
         
-        function bandpass (RO)
-            freqNorm = 2*RO.FREQ_PASS / RO.FREQ_SAMPLE;%normalized passband
-            [RO.b, RO.a] = butter(RO.FILTER_ORDER, freqNorm, 'bandpass');
-        end
-        
-        function filterData (RO)
-            filtPoten = filtfilt(RO.b, RO.a, RO.potential);%filters the ENG
-            absFiltPoten = abs(filtPoten);%rectifies filtered ENG
-            RO.potential = smooth(absFiltPoten, RO.MOVING_AVG_SPAN, 'moving');
-        end
-                
-        function isBurst (RO, spikeThreshold, troughThreshold,...
+        function isBurst (CE, spikeThreshold, troughThreshold,...
                 burstThreshold)
             if (isnan(spikeThreshold))
-                spikeThreshold = 0.05;
+                spikeThreshold = 0.01;
             end
             if (isnan(troughThreshold))
-                troughThreshold = 0.106;
+                troughThreshold = 0.5;
             end
             if (isnan(burstThreshold))
-                burstThreshold = 0.5;
+                burstThreshold = 0.25;
             end
             % preallocates arrays to determine which onsets and offsets to 
             % use for calculations.
-            on = zeros(numel(RO.onset):1);
-            off = zeros(numel(RO.offset):1);
+            on = zeros(numel(CE.onset):1);
+            off = zeros(numel(CE.offset):1);
             % if a spike above the threshold lasts more than the
             % SPIKE_THRESHOLD, adds to the [on], [off] array. 
-            for i = 1:numel(RO.onset)
-                if ( RO.time(RO.offset(i)) -...
-                        RO.time(RO.onset(i)) > spikeThreshold )
-                    on(i) = RO.onset(i);
-                    off(i) = RO.offset(i);
+            for i = 1:numel(CE.onset)
+                if ( CE.time(CE.offset(i)) -...
+                        CE.time(CE.onset(i)) > spikeThreshold )
+                    on(i) = CE.onset(i);
+                    off(i) = CE.offset(i);
                 end
             end
             on = on(on ~= 0);
@@ -61,10 +41,10 @@ classdef root < signalanalysis
             % determines all troughs that are less than the
             % TROUGH_THRESHOLD
             for j = 2:numel(on)
-                if ( ((RO.time(on(j)) -...
-                        RO.time(off(j-1))) < troughThreshold)...
-                        && ( RO.time(on(j)) -...
-                        RO.time(off(j-1)) > 0 ))
+                if ( ((CE.time(on(j)) -...
+                        CE.time(off(j-1))) < troughThreshold)...
+                        && ( CE.time(on(j)) -...
+                        CE.time(off(j-1)) > 0 ))
                     trough_on(j) = on(j);
                     trough_off(j) = off(j-1);
                 end
@@ -82,24 +62,22 @@ classdef root < signalanalysis
             % determines single spikes that was considered to be a burst
             % from previous operations.
             for n = 1:numel(on)
-                if ( (RO.time(off(n)) -...
-                        RO.time(on(n))) < burstThreshold )
+                if ( (CE.time(off(n)) -...
+                        CE.time(on(n))) < burstThreshold )
                     burst_on(n) = on(n);
                     burst_off(n) = off(n);
                 end
             end
             burst_on = burst_on(burst_on ~= 0);
             burst_off = burst_off(burst_off ~= 0);
-            
             % removes the single spikes from the [on], [off] arrays.
             for m = 1:numel(burst_on);
                 on(on == burst_on(m)) = [];
                 off(off == burst_off(m)) = [];
             end
-            RO.onsetRevised = on;
-            RO.offsetRevised = off;
+            CE.onsetRevised = on;
+            CE.offsetRevised = off;
         end
-        
     end
     
 end

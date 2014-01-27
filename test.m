@@ -22,7 +22,7 @@ function varargout = test(varargin)
 
 % Edit the above text to modify the response to help test
 
-% Last Modified by GUIDE v2.5 24-Jan-2014 10:09:05
+% Last Modified by GUIDE v2.5 27-Jan-2014 10:04:43
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -77,13 +77,22 @@ function plot_button_Callback(hObject, eventdata, handles)
 % hObject    handle to plot_button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+time = handles.time;
+threshold = str2double(get(handles.thresh_edit, 'String'));
+axes(handles.axes3);
+cla;
+cp = signalprocess(time, handles.cell, threshold);
+cp.downSample(0);
+cp.bandpass;
+cp.filterData;
+cp.plotData;
+
 axes(handles.axes2);
 cla;
-time = handles.time;
+
 potential = handles.root;
-threshold = str2double(get(handles.thresh_edit, 'String'));
 sp = signalprocess(time, potential, threshold);
-sp.downSample(5);
+sp.downSample(0);
 sp.bandpass;
 sp.filterData;
 sp.plotData;
@@ -265,7 +274,7 @@ function cursor_button_Callback(hObject, eventdata, handles)
 [x, y, button] = ginput(1);
 
 if (button == 1)
-    del_items = findobj(gca, 'Color', 'red', '-or', 'Color', 'blue' ,...
+    del_items = findobj(gca, 'Color', 'red', '-or', 'Color', 'blue',...
         '-or', 'Color', 'green', '-or', 'Marker', '>', '-or',...
         'Marker', '<');
     delete(del_items);
@@ -279,7 +288,7 @@ if (button == 1)
     burst = str2double(get(handles.burst_thresh_edit, 'String'));
     axes(handles.axes2);
     sp = signalprocess(time, potential, threshold);
-    sp.downSample(5);
+    sp.downSample(0);
     sp.bandpass;
     sp.filterData;
     sp.aboveThreshold;
@@ -300,24 +309,25 @@ if (button == 1)
 end
 
 
-function column_edit_Callback(hObject, eventdata, handles)
-% hObject    handle to column_edit (see GCBO)
+function root_col_edit_Callback(hObject, eventdata, handles)
+% hObject    handle to root_col_edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of column_edit as text
-%        str2double(get(hObject,'String')) returns contents of column_edit as a double
+% Hints: get(hObject,'String') returns contents of root_col_edit as text
+%        str2double(get(hObject,'String')) returns contents of root_col_edit as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function column_edit_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to column_edit (see GCBO)
+function root_col_edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to root_col_edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+if ispc && isequal(get(hObject,'BackgroundColor'),...
+        get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
 
@@ -352,11 +362,15 @@ function import_button_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 path_and_file = handles.path_and_file;
-col = str2double(get(handles.column_edit, 'String'));
+root_col = str2double(get(handles.root_col_edit, 'String'));
+cell_col = str2double(get(handles.cell_col_edit, 'String'));
 try
     [data, si] = abfload(path_and_file);
-    root = data(:,col);
+    root = data(:,root_col);
     handles.root = root;
+    guidata(hObject, handles);
+    cell = data(:,cell_col);
+    handles.cell = cell;
     guidata(hObject, handles);
     sample = (1 / (si*10 ^ -6));
     time = (0 : (1/sample) : (numel(root) - 1)/sample)';
@@ -401,7 +415,8 @@ function path_file_edit_CreateFcn(hObject, eventdata, handles)
 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+if ispc && isequal(get(hObject,'BackgroundColor'),...
+        get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
 
@@ -427,7 +442,7 @@ else
     burst = str2double(get(handles.burst_thresh_edit, 'String'));
     axes(handles.axes2);
     sp = signalprocess(time, potential, threshold);
-    sp.downSample(5);
+    sp.downSample(0);
     sp.bandpass;
     sp.filterData;
     sp.aboveThreshold;
@@ -440,4 +455,27 @@ else
     set(handles.avg_dur_edit, 'String', sp.average_burst_duration);
     set(handles.avg_per_edit, 'String', sp.average_burst_period);
     set(handles.avg_amp_edit, 'String', sp.average_amplitude);
+end
+
+
+
+function cell_col_edit_Callback(hObject, eventdata, handles)
+% hObject    handle to cell_col_edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of cell_col_edit as text
+%        str2double(get(hObject,'String')) returns contents of cell_col_edit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function cell_col_edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to cell_col_edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
 end

@@ -1,0 +1,10 @@
+clear r;
+r = root(t, p, 0.04);
+r.bandpass;
+r.filterData;
+r.aboveThreshold;
+r.isBurst(NaN, NaN, NaN);
+r.plotData;
+r.plotMarkers;
+r.averageAmplitude;
+r.plotAmplitude;

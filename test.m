@@ -79,11 +79,8 @@ function plot_button_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 time = handles.time;
 threshold = str2double(get(handles.thresh_edit, 'String'));
-
-
 axes(handles.axes2);
 cla;
-
 potential = handles.root;
 ro = root(time, potential, threshold);
 ro.bandpass;

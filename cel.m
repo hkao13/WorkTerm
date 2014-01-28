@@ -19,7 +19,7 @@ classdef cel < signalanalysis
                 troughThreshold = 0.5;
             end
             if (isnan(burstThreshold))
-                burstThreshold = 0.25;
+                burstThreshold = 0.005;
             end
             % preallocates arrays to determine which onsets and offsets to 
             % use for calculations.
@@ -77,6 +77,13 @@ classdef cel < signalanalysis
             end
             CE.onsetRevised = on;
             CE.offsetRevised = off;
+        end
+        
+        % removes unwanted bursts that are considered as noise from the
+        % onset of offset data sets.
+        function removeBurst (CE, index)
+            CE.onsetRevised(index) = [];
+            CE.offsetRevised(index) = [];
         end
     end
     

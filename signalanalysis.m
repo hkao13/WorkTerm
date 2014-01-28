@@ -15,18 +15,32 @@ classdef signalanalysis < handle
         averageAmp
     end
     
+    methods(Static)
+        
+        function map = collection(time, onsetRevised, offsetRevised)
+            bursts = zeros(numel(onsetRevised):1);
+            for i = 1:numel(onsetRevised)
+                bursts(i).burstNumber = i;
+                bursts(i).onset = time(onsetRevised(i));
+                bursts(i).offset = time(offsetRevised(i));
+            end
+            map = bursts;
+        end
+    end
+    
     methods
+        
         function SA = signalanalysis (time, potential, threshold)
             SA.time = time;
             SA.potential = potential;
             SA.threshold = threshold;
         end
         
-        function aboveThreshold (RO)
-            aboveThreshold = (RO.potential > RO.threshold); 
+        function aboveThreshold (SA)
+            aboveThreshold = (SA.potential > SA.threshold); 
             edge = diff(aboveThreshold); %calculates difference between each index value
-            RO.onset = find(edge == 1); %(0 -> 1) difference of +1 means onset of a spike
-            RO.offset = find(edge == -1);  %(1 -> 0) difference of -1 means ofset of a spike
+            SA.onset = find(edge == 1); %(0 -> 1) difference of +1 means onset of a spike
+            SA.offset = find(edge == -1);  %(1 -> 0) difference of -1 means ofset of a spike
         end
         
         function plotData(SA)

@@ -85,7 +85,7 @@ classdef signalanalysis < handle
                 cumulativeBurstDuration / durationCount;
         end
         
-        function averagePeriod (SA)
+        function averagePeriod(SA)
             cumulativeBurstPeriod = 0;
             period_count = 0;
             for i = 1:numel(SA.onsetRevised)
@@ -105,15 +105,15 @@ classdef signalanalysis < handle
         % mean of all peaks.
         function averageAmplitude (SA)
             max_values = zeros(numel(SA.potential):1);
+            precision = 0.0001;
             for i = 1:numel(SA.onsetRevised)
-                start = SA.onsetRevised(i);
-                stop = SA.offsetRevised(i);
-                for j = find(SA.onset == start):find(SA.offset == stop)
-                    values =...
-                        SA.potential(SA.onset(j):SA.offset(j));
-                end
-                peaks = max(values);
-                max_values(i) = peaks;  
+                start = round2(SA.time(SA.onsetRevised(i)), precision);
+                stop = round2(SA.time(SA.offsetRevised(i)), precision);
+                roundTime = round2(SA.time, precision);
+                value = abs(SA.potential...
+                    (find(roundTime == start):find(roundTime == stop)));
+                peak = mean(findpeaks(value, 'MINPEAKDISTANCE', 3));
+                max_values(i) = peak;  
             end
             max_values = max_values(max_values ~= 0);
             SA.averageAmp = mean(max_values);

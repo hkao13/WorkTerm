@@ -11,7 +11,6 @@ classdef root < signalanalysis
         FILTER_ORDER = 2; % order of the filter
         FREQ_SAMPLE = 10000; % sample frequency (Hz)
         FREQ_PASS = [100, 1000]; % passband frequency (Hz)
-        MOVING_AVG_SPAN = 501; % span of moving average (10E-4s)
     end
     
     methods
@@ -24,10 +23,15 @@ classdef root < signalanalysis
             [RO.b, RO.a] = butter(RO.FILTER_ORDER, freqNorm, 'bandpass');
         end
         
-        function filterData (RO)
+        function filterData (RO, window)
+            if (isnan(window))
+                window = 511;
+            else
+                window = window * (10^4);
+            end
             filtPoten = filtfilt(RO.b, RO.a, RO.potential);%filters the ENG
             absFiltPoten = abs(filtPoten);%rectifies filtered ENG
-            RO.potential = smooth(absFiltPoten, RO.MOVING_AVG_SPAN, 'moving');
+            RO.potential = smooth(absFiltPoten, window, 'moving');
         end
                 
         function isBurst (RO, spikeThreshold, troughThreshold,...
@@ -36,10 +40,10 @@ classdef root < signalanalysis
                 spikeThreshold = 0.05;
             end
             if (isnan(troughThreshold))
-                troughThreshold = 0.106;
+                troughThreshold = 0.105;
             end
             if (isnan(burstThreshold))
-                burstThreshold = 0.5;
+                burstThreshold = 0.7;
             end
             % preallocates arrays to determine which onsets and offsets to 
             % use for calculations.

@@ -2,7 +2,7 @@ classdef signalanalysis < handle
     %UNTITLED2 Summary of this class goes here
     %   Detailed explanation goes here
     
-    properties 
+    properties (Access = protected)
         time
         potential
         potentialMod
@@ -10,10 +10,19 @@ classdef signalanalysis < handle
         onset
         offset
         onsetRevised
-        offsetRevised
-        averageBurstDuration
-        averageBurstPeriod
-        averageAmp
+        offsetRevised  
+        maxValuesArray
+    end
+    
+    methods (Static)
+        
+        function plotAmplitude (amp)
+            hold on;
+            line = refline (0, amp);
+            set(line, 'Color', 'r')
+            hold off;
+        end
+        
     end
         
     methods
@@ -36,11 +45,11 @@ classdef signalanalysis < handle
             if isempty(SA.potentialMod)
                 SA.potentialMod = SA.potential;
             end
-            hold on;
+            %hold on;
             plot (SA.time, SA.potentialMod, 'Color', 'k');
             xlabel('Time (s)');
             ylabel('Voltage (mV)');
-            hold off;
+            %hold off;
         end
         
         function plotMarkers (SA)
@@ -55,16 +64,9 @@ classdef signalanalysis < handle
             hold off;
         end
         
-        function plotAmplitude (SA)
-            hold on;
-            line = refline (0, SA.averageAmp);
-            set(line, 'Color', 'r')
-            hold off;
-        end
-        
         % calculates the average duration of each burst. The duration of a
         % burst is measured from the onset to the offset of that burst.
-        function averageDuration (SA)
+        function averageBurstDuration = averageDuration (SA)
             cumulativeBurstDuration = 0;
             durationCount = 0;
             for i = 1:numel(SA.onsetRevised) 
@@ -73,11 +75,11 @@ classdef signalanalysis < handle
                     SA.time(SA.onsetRevised(i)));
                 durationCount = durationCount + 1;
             end
-            SA.averageBurstDuration =...
+            averageBurstDuration =...
                 cumulativeBurstDuration / durationCount;
         end
         
-        function averagePeriod(SA)
+        function averageBurstPeriod = averagePeriod(SA)
             cumulativeBurstPeriod = 0;
             period_count = 0;
             for i = 1:numel(SA.onsetRevised)
@@ -88,15 +90,15 @@ classdef signalanalysis < handle
                     period_count = period_count + 1;
                 end
             end
-            SA.averageBurstPeriod =...
+            averageBurstPeriod =...
                 cumulativeBurstPeriod / period_count; 
         end
         
         % caluclates the average amplitude of all bursts in the data set.
         % Determines the maximum local peaks of each burst and takes the
         % mean of all peaks.
-        function averageAmplitude (SA)
-            max_values = zeros(numel(SA.time):1);
+        function averageAmp = averageAmplitude (SA)
+            maxValues = zeros(numel(SA.time):1);
             precision = 0.0001;
             for i = 1:numel(SA.onsetRevised)
                 start = round2(SA.time(SA.onsetRevised(i)), precision);
@@ -105,10 +107,10 @@ classdef signalanalysis < handle
                 value = abs(SA.potential...
                     (find(roundTime == start):find(roundTime == stop)));
                 peak = mean(findpeaks(value, 'MINPEAKDISTANCE', 3));
-                max_values(i) = peak;  
+                maxValues(i) = peak;  
             end
-            max_values = max_values(max_values ~= 0);
-            SA.averageAmp = mean(max_values);
+            SA.maxValuesArray = maxValues(maxValues ~= 0);
+            averageAmp = mean(maxValues);
         end
         
         function signalOnset = returnOnset (SA)
@@ -118,7 +120,46 @@ classdef signalanalysis < handle
             end
         end
         
-        function findDeletion (MM, percent)
+        function [on, off] = findDeletion (SA, percent, amp, period)
+            if (isnan(percent))
+                percent = 0.50;
+            else
+                percent = percent / 100;
+            end
+            periodArray = zeros((numel(SA.onsetRevised) - 1):1);
+            for j = 2:numel(SA.onsetRevised)
+                periodArray(j-1) = SA.time(SA.onsetRevised(j)) -...
+                    SA.time(SA.onsetRevised(j-1));
+            end
+            
+            
+            standardDev = std(periodArray);
+            
+            for i = 1:numel(SA.maxValuesArray)
+                if (SA.maxValuesArray(i) < (percent * amp))
+                    on = SA.time(SA.onsetRevised(i));
+                    off = SA.time(SA.onsetRevised(i));
+                    difference = SA.time(SA.onsetRevised(i)) - SA.time(SA.onsetRevised(i-1));
+                    upperBound = period + standardDev;
+                    lowerBound = period - standardDev;
+                   
+                    if((difference > lowerBound) && (difference < upperBound))
+                        sprintf ('Deletion at: %f to %f, Type 1, Non-Reseting', SA.time(SA.onsetRevised(i)), SA.time(SA.offsetRevised(i)))
+                    elseif((difference < lowerBound) || (difference > upperBound))
+                        sprintf ('Deletion at: %f to %f, Type 2, Reseting', SA.time(SA.onsetRevised(i)), SA.time(SA.offsetRevised(i)))
+                    end
+    
+                    hold on;
+                    plot(SA.time(SA.onsetRevised(i)), SA.threshold, 's',...
+                        'MarkerSize', 10, 'MarkerEdgeColor', 'g',...
+                        'MarkerFaceColor', 'b');
+                
+                    plot(SA.time(SA.offsetRevised(i)), SA.threshold, 's',...
+                        'MarkerSize', 10, 'MarkerEdgeColor', 'r',...
+                        'MarkerFaceColor', 'b');
+                    hold off;
+                end
+            end
         end
         
     end

@@ -1,0 +1,17 @@
+threshold = str2double(get(handles.thresh_root_edit, 'String'));
+handles.span = str2double(get(handles.moving_avg_edit, 'String'));
+guidata(hObject, handles);
+axes(handles.axes3);
+cla;
+ce = cel(handles.time, handles.cell, threshold);
+ce.plotData;
+axes(handles.axes2);
+cla;
+ro = root(handles.time, handles.root, threshold);
+ro.bandpass;
+ro.filterData(handles.span);
+ro.plotData;
+set(handles.test_edit, 'String', 'Import Status');
+ax(1) = handles.axes2;
+ax(2) = handles.axes3;
+linkaxes(ax, 'x');

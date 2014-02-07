@@ -7,13 +7,25 @@ classdef manualmode < handle
         potential
         onsetRevised
         offsetRevised
+        onsetDeletion
+        offsetDeletion
         onYValue
         offYValue
         onStruct
         offStruct
         onCount = 0;
         offCount = 0;
-        amp
+    end
+    
+    methods (Static)
+        
+        function plotAmplitude(amp)
+            hold on;
+            line = refline (0, amp);
+            set(line, 'Color', 'r')
+            hold off;
+        end
+        
     end
     
     methods
@@ -29,11 +41,17 @@ classdef manualmode < handle
             MM.onCount = MM.onCount + 1;
         end
         
+        function appendDeletionOnset (MM, onset)
+            MM.onsetDeletion(end + 1) = onset;
+        end
+        
         function deleteOnset(MM)
             MM.onsetRevised(MM.onCount) = [];
             MM.onYValue(MM.onCount) = [];
             MM.onCount = MM.onCount - 1;
         end
+        
+        
         
         function appendOffset(MM, offset, y)
             MM.offsetRevised(end + 1) = offset;
@@ -129,20 +147,12 @@ classdef manualmode < handle
             end
             maxValues = maxValues(maxValues ~= 0);
             averageAmp = mean(maxValues);
-            MM.amp = averageAmp;
         end
         
         function plotThreshold(MM)
             avgThreshold = mean([mean(MM.onYValue), mean(MM.offYValue)]);
             hold on;
             refline(0, avgThreshold);
-            hold off;
-        end
-        
-        function plotAmplitude(MM)
-            hold on;
-            line = refline (0, MM.amp);
-            set(line, 'Color', 'r')
             hold off;
         end
         

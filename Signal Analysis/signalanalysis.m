@@ -97,7 +97,7 @@ classdef signalanalysis < handle
         % caluclates the average amplitude of all bursts in the data set.
         % Determines the maximum local peaks of each burst and takes the
         % mean of all peaks.
-        function averageAmp = averageAmplitude (SA)
+        function averageAmp = averageAmplitude(SA, baseline)
             maxValues = zeros(numel(SA.time):1);
             precision = 0.0001;
             for i = 1:numel(SA.onsetRevised)
@@ -109,7 +109,8 @@ classdef signalanalysis < handle
                 peak = mean(findpeaks(value, 'MINPEAKDISTANCE', 3));
                 maxValues(i) = peak;  
             end
-            SA.maxValuesArray = maxValues(maxValues ~= 0);
+            maxValues = maxValues(maxValues ~= 0);
+            SA.maxValuesArray = maxValues - baseline;
             averageAmp = mean(maxValues);
         end
         
@@ -139,16 +140,18 @@ classdef signalanalysis < handle
                 if (SA.maxValuesArray(i) < (percent * amp))
                     on = SA.time(SA.onsetRevised(i));
                     off = SA.time(SA.onsetRevised(i));
-                    difference = SA.time(SA.onsetRevised(i)) - SA.time(SA.onsetRevised(i-1));
-                    upperBound = period + standardDev;
-                    lowerBound = period - standardDev;
-                   
-                    if((difference > lowerBound) && (difference < upperBound))
-                        sprintf ('Deletion at: %f to %f, Type 1, Non-Reseting', SA.time(SA.onsetRevised(i)), SA.time(SA.offsetRevised(i)))
-                    elseif((difference < lowerBound) || (difference > upperBound))
-                        sprintf ('Deletion at: %f to %f, Type 2, Reseting', SA.time(SA.onsetRevised(i)), SA.time(SA.offsetRevised(i)))
+                    if (i == 1)
+                        fprintf('Deletion at %f to %f,\nUnable to find deletion type\n', SA.time(SA.onsetRevised(i)), SA.time(SA.offsetRevised(i)))
+                    else
+                        difference = SA.time(SA.onsetRevised(i)) - SA.time(SA.onsetRevised(i-1));
+                        upperBound = period + standardDev;
+                        lowerBound = period - standardDev;
+                        if((difference > lowerBound) && (difference < upperBound))
+                            fprintf ('\nDeletion at: %f to %f,\nNon-Reseting\n', SA.time(SA.onsetRevised(i)), SA.time(SA.offsetRevised(i)));
+                        elseif((difference < lowerBound) || (difference > upperBound))
+                            fprintf ('\nDeletion at: %f to %f,\nReseting\n', SA.time(SA.onsetRevised(i)), SA.time(SA.offsetRevised(i)));
+                        end
                     end
-    
                     hold on;
                     plot(SA.time(SA.onsetRevised(i)), SA.threshold, 's',...
                         'MarkerSize', 10, 'MarkerEdgeColor', 'g',...
@@ -158,10 +161,19 @@ classdef signalanalysis < handle
                         'MarkerSize', 10, 'MarkerEdgeColor', 'r',...
                         'MarkerFaceColor', 'b');
                     hold off;
+          
                 end
             end
         end
         
+        function deleteBurst(SA, x)
+            onsetToDelete = (x > SA.time(SA.onsetRevised(1,:)));
+            offsetToDelete = (x < SA.time(SA.offsetRevised(1,:)));
+            ind1 = find(onsetToDelete, 1, 'last');
+            ind2 = find(offsetToDelete, 1, 'first');
+            SA.onsetRevised(ind1) = [];
+            SA.offsetRevised(ind2) = [];
+        end
     end
     
 end

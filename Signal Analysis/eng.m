@@ -22,7 +22,7 @@ function varargout = eng(varargin)
 
 % Edit the above text to modify the response to help eng
 
-% Last Modified by GUIDE v2.5 07-Feb-2014 10:09:43
+% Last Modified by GUIDE v2.5 11-Feb-2014 09:40:10
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -76,7 +76,17 @@ end
 
 function timeDiff = set_time_diff (handles)
     if (numel(handles.cellOnset) ~= numel(handles.rootOnset))
-        timeDiff = 'ERROR';
+        [cellX, cellY] = ginput;
+        [rootX, rootY] = ginput;
+        cellInd = [];
+        rootInd = [];
+        for i = 1:numel(cellX)
+            cellInd(end+1) = find(handles.cellOnset<cellX(i), 1, 'last');
+            rootInd(end+1) = find(handles.rootOnset<rootX(i), 1, 'last');
+        end
+        cellOnset = handles.cellOnset(cellInd);
+        rootOnset = handles.rootOnset(rootInd);
+        timeDiff = delta(cellOnset, rootOnset);
     else
         timeDiff = delta(handles.cellOnset, handles.rootOnset);
     end
@@ -100,6 +110,18 @@ function plot_button_Callback(hObject, eventdata, handles)
     engPlotButton;
 end
 
+% --- Executes on button press in baseline_button.
+function baseline_button_Callback(hObject, eventdata, handles)
+    [x, y] = ginput(1);
+    handles.baseline = y;
+    guidata(hObject, handles);
+    set(handles.baseline_edit, 'String', handles.baseline)
+    hold on;
+    base = refline(0, handles.baseline);
+    set(base, 'Color', 'r');
+    hold off;
+end
+
 % -------------------------------------------------------------------------
 % ROOT INPUT PANEL BUTTONS
 % -------------------------------------------------------------------------
@@ -118,6 +140,11 @@ function manual_root_button_Callback(hObject, eventdata, handles)
     engRootManualButton;
 end
 
+% --- Executes on button press in erase_root_button.
+function erase_root_button_Callback(hObject, eventdata, handles)
+    engRootEraseButton;
+end
+
 % -------------------------------------------------------------------------
 % CELL INPUT PANEL BUTTONS
 % -------------------------------------------------------------------------
@@ -130,6 +157,10 @@ end
 % --- Executes on button press in time_diff_button.
 function time_diff_button_Callback(hObject, eventdata, handles)
     set(handles.time_diff_edit, 'String', set_time_diff(handles));
+end
+
+% --- Executes on button press in erase_cell_button.
+function erase_cell_button_Callback(hObject, eventdata, handles)
 end
 
 % -------------------------------------------------------------------------
@@ -268,6 +299,15 @@ function to_edit_CreateFcn(hObject, eventdata, handles)
     end
 end
 
+function baseline_edit_Callback(hObject, eventdata, handles)
+end
+
+% --- Executes during object creation, after setting all properties.
+function baseline_edit_CreateFcn(hObject, eventdata, handles)
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+end
 
 % -------------------------------------------------------------------------
 % SETTINGS BUTTON

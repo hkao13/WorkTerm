@@ -13,7 +13,7 @@ end
 
 try
     [data, si] =...
-        abfload(handles.path_and_file, 'start', first, 'stop', last);
+    abfload(handles.path_and_file, 'start', first, 'stop', last);
     handles.root = data(:,root_col);
     handles.cell = data(:,cell_col);
     sample = (1 / (si*10 ^ -6));

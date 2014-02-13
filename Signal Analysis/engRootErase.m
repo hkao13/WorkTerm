@@ -8,15 +8,18 @@ if (button == 1)
         'Marker', '<', '-or', 'Marker', 's');
     delete(del_items); 
     ro.deleteBurst(x);
+    [duration, count] = ro.averageDuration;
     period = ro.averagePeriod;
-    amp = ro.averageAmplitude(handles.baseline);
+    amp = ro.averageAmplitude(handles.baseline1);
+    actualAmp = amp - handles.baseline1;
     ro.plotMarkers;
     root.plotAmplitude(amp);
     ro.findDeletion(handles.percent, amp, period);
-    set(handles.root_avg_dur_edit, 'String', ro.averageDuration);
-    set(handles.root_avg_per_edit, 'String', period);
-    set(handles.root_avg_amp_edit, 'String', amp);
-    handles.rootOnset = ro.returnOnset;
+    set(handles.root1_count_edit, 'String', count);
+    set(handles.root1_avg_dur_edit, 'String', duration);
+    set(handles.root1_avg_per_edit, 'String', period);
+    set(handles.root1_avg_amp_edit, 'String', actualAmp);
+    handles.rootOnset1 = ro.returnOnset;
     guidata(hObject, handles);
     engRootErase(hObject, handles, ro);
 end

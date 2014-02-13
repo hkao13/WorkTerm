@@ -1,22 +1,22 @@
-function engRootManualMode( hObject, handles, mm, x, y, button )
+function engRootManualMode( hObject, handles, mm1, x, y, button )
 %UNTITLED8 Summary of this function goes here
 %   Detailed explanation goes here
 
 if (button == 1)
-    mm.appendOnset(x, y);
-    mm.plotOnset(x, y);
+    mm1.appendOnset(x, y);
+    mm1.plotOnset(x, y);
 end
  
 if (button == 3)
-    mm.appendOffset(x, y);
-    mm.plotOffset(x, y);
+    mm1.appendOffset(x, y);
+    mm1.plotOffset(x, y);
 end
 if (button == 8)
     try
-        mm.deleteOnset;
-        mm.deleteOnsetMarker;
-        mm.deleteOffset;
-        mm.deleteOffsetMarker;
+        mm1.deleteOnset;
+        mm1.deleteOnsetMarker;
+        mm1.deleteOffset;
+        mm1.deleteOffsetMarker;
     catch err
         disp(err);
     end
@@ -24,19 +24,22 @@ end
 
 if (isempty(button))
     button = NaN;
-    amp = mm.averageAmplitude;
-    set(handles.root_avg_dur_edit, 'String', mm.averageDuration);
-    set(handles.root_avg_per_edit, 'String', mm.averagePeriod);
-    set(handles.root_avg_amp_edit, 'String', amp);
-    mm.plotThreshold;
-    mm.plotAmplitude(amp);
-    handles.rootOnset = mm.returnOnset;
+    [duration, count] = mm1.averageDuration;
+    amp = mm1.averageAmplitude;
+    actualAmp = amp - handles.baseline1;
+    set(handles.root1_count_edit, 'String', count);
+    set(handles.root1_avg_dur_edit, 'String', duration);
+    set(handles.root1_avg_per_edit, 'String', mm1.averagePeriod);
+    set(handles.root1_avg_amp_edit, 'String', actualAmp);
+    mm1.plotThreshold;
+    mm1.plotAmplitude(amp);
+    handles.rootOnset1 = mm1.returnOnset;
     guidata(hObject, handles);
 end
     
 if ((button == 1) || (button == 3) || (button == 8))
     [x, y, button] = ginput(1);
-    engRootManualMode(hObject, handles, mm, x, y, button);
+    engRootManualMode(hObject, handles, mm1, x, y, button);
 end
 end
 

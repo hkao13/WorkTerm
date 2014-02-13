@@ -1,35 +1,35 @@
-function varargout = engSettings(varargin)
-% ENGSETTINGS MATLAB code for engSettings.fig
-%      ENGSETTINGS, by itself, creates a new ENGSETTINGS or raises the existing
+function varargout = engSettings2(varargin)
+% ENGSETTINGS2 MATLAB code for engSettings2.fig
+%      ENGSETTINGS2, by itself, creates a new ENGSETTINGS2 or raises the existing
 %      singleton*.
 %
-%      H = ENGSETTINGS returns the handle to a new ENGSETTINGS or the handle to
+%      H = ENGSETTINGS2 returns the handle to a new ENGSETTINGS2 or the handle to
 %      the existing singleton*.
 %
-%      ENGSETTINGS('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in ENGSETTINGS.M with the given input arguments.
+%      ENGSETTINGS2('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in ENGSETTINGS2.M with the given input arguments.
 %
-%      ENGSETTINGS('Property','Value',...) creates a new ENGSETTINGS or raises the
+%      ENGSETTINGS2('Property','Value',...) creates a new ENGSETTINGS2 or raises the
 %      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before engSettings_OpeningFcn gets called.  An
+%      applied to the GUI before engSettings2_OpeningFcn gets called.  An
 %      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to engSettings_OpeningFcn via varargin.
+%      stop.  All inputs are passed to engSettings2_OpeningFcn via varargin.
 %
 %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
 %      instance to run (singleton)".
 %
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
-% Edit the above text to modify the response to help engSettings
+% Edit the above text to modify the response to help engSettings2
 
-% Last Modified by GUIDE v2.5 12-Feb-2014 13:51:23
+% Last Modified by GUIDE v2.5 12-Feb-2014 13:46:42
 
 % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
     gui_State = struct('gui_Name',       mfilename, ...
                        'gui_Singleton',  gui_Singleton, ...
-                       'gui_OpeningFcn', @engSettings_OpeningFcn, ...
-                       'gui_OutputFcn',  @engSettings_OutputFcn, ...
+                       'gui_OpeningFcn', @engSettings2_OpeningFcn, ...
+                       'gui_OutputFcn',  @engSettings2_OutputFcn, ...
                        'gui_LayoutFcn',  [] , ...
                        'gui_Callback',   []);
     if nargin && ischar(varargin{1})
@@ -45,26 +45,26 @@ end
 % End initialization code - DO NOT EDIT
 
 
-% --- Executes just before engSettings is made visible.
-function engSettings_OpeningFcn(hObject, eventdata, handles, varargin)
+% --- Executes just before engSettings2 is made visible.
+function engSettings2_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to engSettings (see VARARGIN)
+% varargin   command line arguments to engSettings2 (see VARARGIN)
 
-% Choose default command line output for engSettings
+% Choose default command line output for engSettings2
     handles.output = hObject;
 
 % Update handles structure
     guidata(hObject, handles);
 
-% UIWAIT makes engSettings wait for user response (see UIRESUME)
-% uiwait(handles.engSettings);
+% UIWAIT makes engSettings2 wait for user response (see UIRESUME)
+% uiwait(handles.engSettings2);
 end    
 
 % --- Outputs from this function are returned to the command line.
-function varargout = engSettings_OutputFcn(hObject, eventdata, handles) 
+function varargout = engSettings2_OutputFcn(hObject, eventdata, handles) 
     varargout{1} = handles.output;
 end
 
@@ -106,13 +106,13 @@ end
 % --- Executes on button press in ok_button.
 function ok_button_Callback(hObject, eventdata, handles)
     setappdata...
-        (0, 'spike'  , str2double(get(handles.spike_thresh_edit , 'String')));
+        (0, 'spike2'  , str2double(get(handles.spike_thresh_edit , 'String')));
     setappdata...
-        (0, 'trough' , str2double(get(handles.trough_thresh_edit, 'String')));
+        (0, 'trough2' , str2double(get(handles.trough_thresh_edit, 'String')));
     setappdata...
-        (0, 'burst'  , str2double(get(handles.burst_thresh_edit , 'String')));
+        (0, 'burst2'  , str2double(get(handles.burst_thresh_edit , 'String')));
     setappdata...
-        (0, 'percent', str2double(get(handles.del_percent_edit  , 'String')));
+        (0, 'percent2', str2double(get(handles.del_percent_edit  , 'String')));
 end
 
 

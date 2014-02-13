@@ -66,7 +66,7 @@ classdef signalanalysis < handle
         
         % calculates the average duration of each burst. The duration of a
         % burst is measured from the onset to the offset of that burst.
-        function averageBurstDuration = averageDuration (SA)
+        function [averageBurstDuration, durationCount] = averageDuration (SA)
             cumulativeBurstDuration = 0;
             durationCount = 0;
             for i = 1:numel(SA.onsetRevised) 

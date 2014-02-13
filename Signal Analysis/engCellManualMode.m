@@ -23,7 +23,9 @@ function engCellManualMode( hObject, handles, mm, x, y, button )
     
     if (isempty(button))
         button = NaN;
-        set(handles.cell_avg_dur_edit, 'String', mm.averageDuration);
+        [duration, count] = mm.averageDuration;
+        set(handles.cell_count_edit, 'String', count);
+        set(handles.cell_avg_dur_edit, 'String', duration);
         set(handles.cell_avg_per_edit, 'String', mm.averagePeriod);
         mm.plotThreshold;
         handles.cellOnset = mm.returnOnset;

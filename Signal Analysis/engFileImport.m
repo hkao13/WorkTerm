@@ -22,7 +22,7 @@ function varargout = engFileImport(varargin)
 
 % Edit the above text to modify the response to help engFileImport
 
-% Last Modified by GUIDE v2.5 11-Feb-2014 10:43:39
+% Last Modified by GUIDE v2.5 11-Feb-2014 12:56:21
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -115,6 +115,7 @@ end
 
 % --- Executes on button press in import_button.
 function import_button_Callback(hObject, eventdata, handles)
+    engImportButton;
 end
 
 
@@ -161,3 +162,14 @@ function root2_edit_CreateFcn(hObject, eventdata, handles)
     end
 end
 
+
+
+function span_edit_Callback(hObject, eventdata, handles)
+end
+
+% --- Executes during object creation, after setting all properties.
+function span_edit_CreateFcn(hObject, eventdata, handles)
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+end

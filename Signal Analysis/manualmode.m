@@ -97,7 +97,7 @@ classdef manualmode < handle
             hold off;
         end
         
-        function averageBurstDuration = averageDuration(MM)
+        function [averageBurstDuration, count] = averageDuration(MM)
             try
                 cumulativeBurstDuration = 0;
                 count = 0;

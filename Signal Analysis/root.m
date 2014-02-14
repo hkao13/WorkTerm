@@ -14,9 +14,18 @@ classdef root < signalanalysis
     end
     
     methods
-        function RO = root(time, potential, threshold)
-            RO = RO@signalanalysis(time, potential, threshold);
+        function RO = root(time, potential, threshold, onsetTimes, offsetTimes)
+            if (nargin == 3)
+                superArgs{1} = [];
+                superArgs{2} = [];
+            else
+                superArgs{1} = onsetTimes;
+                superArgs{2} = offsetTimes;
+            end
+            RO = RO@signalanalysis(time, potential, threshold, superArgs{:});
+    
         end
+        
         
         function bandpass (RO)
             freqNorm = 2*RO.FREQ_PASS / RO.FREQ_SAMPLE;%normalized passband

@@ -19,7 +19,7 @@ if (button == 1)
     set(handles.root2_avg_dur_edit, 'String', duration);
     set(handles.root2_avg_per_edit, 'String', period);
     set(handles.root2_avg_amp_edit, 'String', actualAmp);
-    handles.rootOnset2 = ro2.returnOnset;
+    [handles.rootOnset2, handles.rootOffset2] = ro2.returnBurstInfo;
     guidata(hObject, handles);
     engRootErase2(hObject, handles, ro2);
 end

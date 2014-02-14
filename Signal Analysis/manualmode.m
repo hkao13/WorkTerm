@@ -30,9 +30,16 @@ classdef manualmode < handle
     
     methods
         
-        function MM = manualmode(time, potential)
+        function MM = manualmode(time, potential, onsetRevised, offsetRevised)
             MM.time = time;
             MM.potential = potential;
+            if (nargin == 2)
+                MM.onsetRevised = [];
+                MM.offsetRevised = [];
+            else
+                MM.onsetRevised = onsetRevised;
+                MM.offsetRevised = offsetRevised;
+            end
         end
 
         function appendOnset(MM, onset, y)
@@ -115,6 +122,7 @@ classdef manualmode < handle
         
         function averagePeriodDuration = averagePeriod(MM)
             try
+                sort(MM.onsetRevised, 'ascend');
                 cumulativePeriodDuration = 0;
                 count = 0;
                 i = 1;
@@ -134,6 +142,8 @@ classdef manualmode < handle
         end
         
         function averageAmp = averageAmplitude(MM)
+            MM.onsetRevised = sort(MM.onsetRevised, 'ascend');
+            MM.offsetRevised = sort(MM.offsetRevised, 'ascend');
             maxValues = zeros(numel(MM.time):1);
             precision = 0.0001;
             for i = 1:numel(MM.onsetRevised)
@@ -158,6 +168,10 @@ classdef manualmode < handle
         
         function signalOnset = returnOnset (MM)
             signalOnset = MM.onsetRevised;
+        end
+        
+        function signalOffset = returnOffset(MM)
+            signalOffset = MM.offsetRevised;
         end
     end
     

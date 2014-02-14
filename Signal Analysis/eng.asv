@@ -22,7 +22,7 @@ function varargout = eng(varargin)
 
 % Edit the above text to modify the response to help eng
 
-% Last Modified by GUIDE v2.5 14-Feb-2014 15:35:56
+% Last Modified by GUIDE v2.5 12-Feb-2014 17:11:13
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -74,7 +74,7 @@ function varargout = eng_OutputFcn(hObject, eventdata, handles)
     varargout{1} = handles.output;
 end
 
-function [timeOnsetDiff, timeOffsetDiff] = set_time_diff (handles)
+function timeOnsetDiff = set_time_diff (handles)
     
     fig = engSelectPlots;
     waitfor(fig);
@@ -114,22 +114,15 @@ function [timeOnsetDiff, timeOffsetDiff] = set_time_diff (handles)
         msg2 = msgbox('Please select the bursts in the second plot using left click, then press ENTER when finished.');
         waitfor(msg2);
         [rootX, rootY] = ginput;
-        cellOnsetInd = [];
-        rootOnsetInd = [];
-        cellOffsetInd = [];
-        rootOffsetInd = [];
+        cellInd = [];
+        rootInd = [];
         for i = 1:numel(cellX)
-            cellOnsetInd(end+1) = find(firstPlotOnset < cellX(i), 1, 'last');
-            rootOnsetInd(end+1) = find(secondPlotOnset < rootX(i), 1, 'last');
-            cellOffsetInd(end+1) = find(firstPlotOffset > cellX(i), 1, 'first');
-            rootOffsetInd(end+1) = find(secondPlotOffset > rootX(i), 1, 'first');
+            cellInd(end+1) = find(firstPlotOnset<cellX(i), 1, 'last');
+            rootInd(end+1) = find(secondPlotOnset<rootX(i), 1, 'last');
         end
-        cellOnset = firstPlotOnset(cellOnsetInd);
-        rootOnset = secondPlotOnset(rootOnsetInd);
-        cellOffset = firstPlotOffset(cellOffsetInd);
-        rootOffset = secondPlotOffset(rootOffsetInd);
+        cellOnset = firstPlotOnset(cellInd);
+        rootOnset = secondPlotOnset(rootInd);
         timeOnsetDiff = delta(cellOnset, rootOnset);
-        timeOffsetDiff = delta(cellOffset, rootOffset);
     else
         msg3 = msgbox('Equal amount of bursts between both plots. Press O.K. to get result.');
         waitfor(msg3);
@@ -192,10 +185,7 @@ end
 
 % --- Executes on button press in time_diff_button.
 function time_diff_button_Callback(hObject, eventdata, handles)
-    [onsetDiff, offsetDiff] = set_time_diff(handles);
-    set(handles.onset_diff_edit, 'String', onsetDiff);
-    set(handles.offset_diff_edit, 'String', offsetDiff);
-    
+    set(handles.time_diff_edit, 'String', set_time_diff(handles));
 end
 
 % --- Executes on button press in erase_cell_button.
@@ -342,11 +332,12 @@ function cell_avg_per_edit_CreateFcn(hObject, eventdata, handles)
     end
 end
 
-function onset_diff_edit_Callback(hObject, eventdata, handles)
+function time_diff_edit_Callback(hObject, eventdata, handles)
+
 end
 
 % --- Executes during object creation, after setting all properties.
-function onset_diff_edit_CreateFcn(hObject, eventdata, handles)
+function time_diff_edit_CreateFcn(hObject, eventdata, handles)
     if ispc && isequal(get(hObject,'BackgroundColor'),...
             get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
@@ -458,16 +449,4 @@ function root1_count_edit_CreateFcn(hObject, eventdata, handles)
     if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
     end
-end
-
-
-
-function offset_diff_edit_Callback(hObject, eventdata, handles)
-end
-
-% --- Executes during object creation, after setting all properties.
-function offset_diff_edit_CreateFcn(hObject, eventdata, handles)
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
 end

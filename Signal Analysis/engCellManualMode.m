@@ -1,40 +1,23 @@
-function engCellManualMode( hObject, handles, mm, x, y, button )
+function engCellManualMode( hObject, handles, mm )
 %UNTITLED10 Summary of this function goes here
 %   Detailed explanation goes here
+    [x, y, button] = ginput(1);
     if (button == 1)
-        mm.appendOnset(x, y);
-        mm.plotOnset(x, y);
+        mm.addBurstOnset(x, y);
+        engCellManualMode(hObject, handles, mm);
     end
     if (button == 3)
-        mm.appendOffset(x, y);
-        mm.plotOffset(x, y);
+        mm.addBurstOffset(x, y);
+        engCellManualMode(hObject, handles, mm);
     end
-
-    if (button == 8)
-        try
-            mm.deleteOnset;
-            mm.deleteOnsetMarker;
-            mm.deleteOffset;
-            mm.deleteOffsetMarker;
-        catch err
-            disp(err);
-        end
-    end
-    
     if (isempty(button))
-        button = NaN;
         [duration, count] = mm.averageDuration;
         set(handles.cell_count_edit, 'String', count);
         set(handles.cell_avg_dur_edit, 'String', duration);
         set(handles.cell_avg_per_edit, 'String', mm.averagePeriod);
-        mm.plotThreshold;
-        handles.cellOnset = mm.returnOnset;
+        [handles.cellOnset, handles.cellOffset] = mm.returnBurstInfo;
         guidata(hObject, handles);
     end
-    
-    if ((button == 1) || (button == 3) || (button == 8))
-        [x, y, button] = ginput(1);
-        engCellManualMode( hObject, handles, mm, x, y, button )
-    end
+
 end
 

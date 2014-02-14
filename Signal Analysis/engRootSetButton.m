@@ -24,6 +24,7 @@ else
     ro1.filterData(span);
     ro1.aboveThreshold;
     ro1.isBurst(handles.spike, handles.trough, handles.burst);
+    ro1.indexToTime;
     [duration, count] = ro1.averageDuration;
     period = ro1.averagePeriod;
     amp = ro1.averageAmplitude(handles.baseline1);
@@ -36,6 +37,6 @@ else
     set(handles.root1_avg_per_edit, 'String', period);
     set(handles.root1_avg_amp_edit, 'String', actualAmp);
 
-    handles.rootOnset1 = ro1.returnOnset;
+    [handles.rootOnset1, handles.rootOffset1] = ro1.returnBurstInfo;
     guidata(hObject, handles);
 end

@@ -21,18 +21,19 @@ if (button == 1)
     ro.filterData(span);
     ro.aboveThreshold;
     ro.isBurst(handles.spike2, handles.trough2, handles.burst2);
+    ro.indexToTime;
     [duration, count] = ro.averageDuration;
     period = ro.averagePeriod;
     amp = ro.averageAmplitude(handles.baseline2);
     actualAmp = amp - handles.baseline2;
     ro.plotMarkers;
     root.plotAmplitude(amp);
-    ro.findDeletion(handles.percent, amp, period);
+    ro.findDeletion(handles.percent2, amp, period);
     set(handles.root2_count_edit, 'String', count);
     set(handles.root2_avg_dur_edit, 'String', duration);
     set(handles.root2_avg_per_edit, 'String', period);
     set(handles.root2_avg_amp_edit, 'String', actualAmp);
-    handles.rootOnset2 = ro.returnOnset;
+    [handles.rootOnset2, handles.rootOffset2] = ro.returnBurstInfo;
     guidata(hObject, handles);
     cursor_root2_button_Callback(hObject, eventdata, handles);
 end

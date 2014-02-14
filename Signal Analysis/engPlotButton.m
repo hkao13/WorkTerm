@@ -27,7 +27,25 @@ ro2.bandpass;
 ro2.filterData(span);
 ro2.plotData
 
+
+warning OFF;
 ax(1) = handles.axes2;
 ax(2) = handles.axes3;
 ax(4) = handles.axes4;
 linkaxes(ax, 'x');
+
+
+
+try
+    handles = rmfield(handles, 'rootOnset1');
+    handles = rmfield(handles, 'rootOffset1');
+    guidata(hObject, handles);
+catch err
+end
+
+try
+    handles = rmfield(handles, 'rootOnset2');
+    handles = rmfield(handles, 'rootOffset2');
+    guidata(hObject, handles);
+catch err
+end

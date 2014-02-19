@@ -6,7 +6,6 @@ handles.spike2 = getappdata(0, 'spike2');
 handles.trough2 = getappdata(0, 'trough2');
 handles.burst2 = getappdata(0, 'burst2');
 handles.percent2 = getappdata(0, 'percent2');
-guidata(hObject, handles);
 if (button == 1)
     del_items = findobj(handles.axes4, 'Color', 'red', '-or', 'Color', 'blue',...
         '-or', 'Color', 'green', '-or', 'Color', 'm', '-or', 'Marker', '>', '-or',...

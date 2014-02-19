@@ -36,7 +36,6 @@ else
     set(handles.root2_avg_dur_edit, 'String', duration);
     set(handles.root2_avg_per_edit, 'String', period);
     set(handles.root2_avg_amp_edit, 'String', actualAmp);
-
     [handles.rootOnset2, handles.rootOffset2] = ro2.returnBurstInfo;
     guidata(hObject, handles);
 end

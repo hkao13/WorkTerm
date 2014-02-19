@@ -1,3 +1,8 @@
+try
+    delete(handles)
+    guidata(hObject, handles);
+catch err
+end
 threshold1 = str2double(get(handles.thresh_root1_edit, 'String'));
 threshold2 = str2double(get(handles.thresh_root2_edit, 'String'));
 span = getappdata(0, 'span');

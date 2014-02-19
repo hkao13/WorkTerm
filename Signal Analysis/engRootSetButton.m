@@ -1,42 +1,69 @@
-threshold1 = str2double(get(handles.thresh_root1_edit, 'String'));
-time = getappdata(0, 'time');
-root1 = getappdata(0, 'root1');
-span = getappdata(0, 'span');
-handles.spike = getappdata(0, 'spike');
-handles.trough = getappdata(0, 'trough');
-handles.burst = getappdata(0, 'burst');
-handles.percent = getappdata(0, 'percent');
-guidata(hObject, handles);
-if ( isnan(threshold1) )
-    set(handles.thresh_root1_edit, 'String', 'Please enter a value.')
-else
-    del_items = findobj(handles.axes2, 'Color', 'red', '-or', 'Color', 'blue',...
-        '-or', 'Color', 'green', '-or', 'Color', 'm', '-or', 'Marker', '>', '-or',...
-        'Marker', '<', '-or', 'Marker', 's');
-    delete(del_items);
-    handles.spike = getappdata(0, 'spike');
-    handles.trough = getappdata(0, 'trough');
-    handles.burst = getappdata(0, 'burst');
-    guidata(hObject, handles);
-    axes(handles.axes2);
-    ro1 = root(time, root1, threshold1);
-    ro1.bandpass;
-    ro1.filterData(span);
-    ro1.aboveThreshold;
-    ro1.isBurst(handles.spike, handles.trough, handles.burst);
-    ro1.indexToTime;
-    [duration, count] = ro1.averageDuration;
-    period = ro1.averagePeriod;
-    amp = ro1.averageAmplitude(handles.baseline1);
-    actualAmp = amp - handles.baseline1;
-    ro1.plotMarkers;
-    root.plotAmplitude(amp);
-    ro1.findDeletion(handles.percent, amp, period);
-    set(handles.root1_count_edit, 'String', count);
-    set(handles.root1_avg_dur_edit, 'String', duration);
-    set(handles.root1_avg_per_edit, 'String', period);
-    set(handles.root1_avg_amp_edit, 'String', actualAmp);
-
-    [handles.rootOnset1, handles.rootOffset1] = ro1.returnBurstInfo;
-    guidata(hObject, handles);
+switch identity
+    case 1
+        ax = handles.axes2;
+        baseline = handles.baseline1;
+        threshold = str2double(get(handles.thresh_root1_edit, 'String'));
+        time = getappdata(0, 'time');
+        potential = getappdata(0, 'root1');
+        span = getappdata(0, 'span');
+        spike = getappdata(0, 'spike');
+        trough = getappdata(0, 'trough');
+        burst = getappdata(0, 'burst');
+        percent = getappdata(0, 'percent');
+        if ( isnan(threshold) )
+            fprintf('\nPlease enter a value into the threshold edit box, then press SET.\n');
+        else
+            ro = root(time, potential, threshold);
+        end
+           
+    case 2
+        ax = handles.axes4;
+        baseline = handles.baseline2;
+        threshold = str2double(get(handles.thresh_root2_edit, 'String'));
+        time = getappdata(0, 'time');
+        potential = getappdata(0, 'root2');
+        span = getappdata(0, 'span');
+        spike = getappdata(0, 'spike2');
+        trough = getappdata(0, 'trough2');
+        burst = getappdata(0, 'burst2');
+        percent = getappdata(0, 'percent2');
+        if ( isnan(threshold) )
+            fprintf('\nPlease enter a value into the threshold edit box, then press SET.\n');
+        else
+            ro = root(time, potential, threshold);
+        end
 end
+
+del_items = findobj(ax, 'Color', 'red', '-or', 'Color', 'blue',...
+    '-or', 'Color', 'green', '-or', 'Color', 'm', '-or', 'Marker', '>', '-or',...
+    'Marker', '<', '-or', 'Marker', 's');
+delete(del_items);
+axes(ax);
+ro.bandpass;
+ro.filterData(span);
+ro.aboveThreshold;
+ro.isBurst(spike, trough, burst);
+ro.indexToTime;
+[duration, count] = ro.averageDuration;
+period = ro.averagePeriod;
+amp = ro.averageAmplitude(baseline);
+actualAmp = amp - baseline;
+ro.plotMarkers;
+root.plotAmplitude(amp);
+ro.findDeletion(percent, amp, period);
+
+switch identity
+    case 1
+        set(handles.root1_count_edit, 'String', count);
+        set(handles.root1_avg_dur_edit, 'String', duration);
+        set(handles.root1_avg_per_edit, 'String', period);
+        set(handles.root1_avg_amp_edit, 'String', actualAmp);
+        [handles.rootOnset1, handles.rootOffset1] = ro.returnBurstInfo;
+    case 2
+        set(handles.root2_count_edit, 'String', count);
+        set(handles.root2_avg_dur_edit, 'String', duration);
+        set(handles.root2_avg_per_edit, 'String', period);
+        set(handles.root2_avg_amp_edit, 'String', actualAmp);
+        [handles.rootOnset2, handles.rootOffset2] = ro.returnBurstInfo;
+end
+guidata(hObject, handles);

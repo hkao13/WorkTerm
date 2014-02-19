@@ -74,6 +74,15 @@ function varargout = eng_OutputFcn(hObject, eventdata, handles)
     varargout{1} = handles.output;
 end
 
+% --------------------------------------------------------------------
+function file_menu_Callback(hObject, eventdata, handles)
+end
+
+% --------------------------------------------------------------------
+function file_open_menu_Callback(hObject, eventdata, handles)
+    engFileImport;
+end
+
 function [timeOnsetDiff, timeOffsetDiff] = set_time_diff (handles)
     
     fig = engSelectPlots;
@@ -139,48 +148,14 @@ function [timeOnsetDiff, timeOffsetDiff] = set_time_diff (handles)
 end
 
 % -------------------------------------------------------------------------
-% FILE IMPORT PANEL BUTTONS
+% PLOT/RESET BUTTON
 % -------------------------------------------------------------------------
-
 
 % --- Executes on button press in plot_button.
 function plot_button_Callback(hObject, eventdata, handles)
     engPlotButton;
 end
-% -------------------------------------------------------------------------
-% ROOT 1 PANEL BUTTONS
-% -------------------------------------------------------------------------
-% --- Executes on button press in set_root1_button.
-function set_root1_button_Callback(hObject, eventdata, handles)
-    engRootSetButton;
-end
 
-% --- Executes on button press in cursor_root1_button.
-function cursor_root1_button_Callback(hObject, eventdata, handles)
-    engRootCursorButton;
-end
-
-% --- Executes on button press in manual_root1_button.
-function manual_root1_button_Callback(hObject, eventdata, handles)
-    engRootManualButton;
-end
-
-% --- Executes on button press in erase_root1_button.
-function erase_root1_button_Callback(hObject, eventdata, handles)
-    engRootEraseButton;
-end
-
-% --- Executes on button press in baseline1_button.
-function baseline1_button_Callback(hObject, eventdata, handles)
-    [x, y] = ginput(1);
-    handles.baseline1 = y;
-    guidata(hObject, handles);
-    set(handles.baseline1_edit, 'String', handles.baseline1)
-    hold on;
-    base = refline(0, handles.baseline1);
-    set(base, 'Color', 'r');
-    hold off;
-end
 % -------------------------------------------------------------------------
 % CELL INPUT PANEL BUTTONS
 % -------------------------------------------------------------------------
@@ -203,6 +178,109 @@ function erase_cell_button_Callback(hObject, eventdata, handles)
 end
 
 % -------------------------------------------------------------------------
+% CELL INPUT PANEL EDIT BOXES
+% -------------------------------------------------------------------------
+function cell_count_edit_Callback(hObject, eventdata, handles)
+end
+
+% --- Executes during object creation, after setting all properties.
+function cell_count_edit_CreateFcn(hObject, eventdata, handles)
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+end
+
+% -------------------------------------------------------------------------
+% CELL OUTPUT PANEL EDIT BOXES
+% -------------------------------------------------------------------------
+function cell_avg_dur_edit_Callback(hObject, eventdata, handles)
+end
+
+% --- Executes during object creation, after setting all properties.
+function cell_avg_dur_edit_CreateFcn(hObject, eventdata, handles)
+    if ispc && isequal(get(hObject,'BackgroundColor'),...
+            get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+    end
+end
+
+function cell_avg_per_edit_Callback(hObject, eventdata, handles)
+end
+
+% --- Executes during object creation, after setting all properties.
+function cell_avg_per_edit_CreateFcn(hObject, eventdata, handles)
+    if ispc && isequal(get(hObject,'BackgroundColor'),...
+            get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+end
+
+function onset_diff_edit_Callback(hObject, eventdata, handles)
+end
+
+% --- Executes during object creation, after setting all properties.
+function onset_diff_edit_CreateFcn(hObject, eventdata, handles)
+    if ispc && isequal(get(hObject,'BackgroundColor'),...
+            get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+end
+
+function offset_diff_edit_Callback(hObject, eventdata, handles)
+end
+
+% --- Executes during object creation, after setting all properties.
+function offset_diff_edit_CreateFcn(hObject, eventdata, handles)
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+end
+
+% -------------------------------------------------------------------------
+% ROOT 1 PANEL BUTTONS
+% -------------------------------------------------------------------------
+% --- Executes on button press in set_root1_button.
+function set_root1_button_Callback(hObject, eventdata, handles)
+    identity = 1;
+    engRootSetButton;
+end
+
+% --- Executes on button press in cursor_root1_button.
+function cursor_root1_button_Callback(hObject, eventdata, handles)
+    identity = 1;
+    engRootCursorButton;
+end
+
+% --- Executes on button press in manual_root1_button.
+function manual_root1_button_Callback(hObject, eventdata, handles)
+    identity = 1;
+    engRootManualButton;
+end
+
+% --- Executes on button press in erase_root1_button.
+function erase_root1_button_Callback(hObject, eventdata, handles)
+    identity = 1;
+    engRootEraseButton;
+end
+
+% --- Executes on button press in baseline1_button.
+function baseline1_button_Callback(hObject, eventdata, handles)
+    [x, y] = ginput(1);
+    try
+        delete(handles.base1);
+    catch err
+    end
+    handles.baseline1 = y;
+    set(handles.baseline1_edit, 'String', handles.baseline1)
+    hold on;
+    handles.base1 = refline(0, handles.baseline1);
+    set(handles.base1, 'Color', 'r');
+    hold off;
+    guidata(hObject, handles);
+    
+end
+
+% -------------------------------------------------------------------------
 % ROOT 1 PANEL EDIT BOXES
 % -------------------------------------------------------------------------
 function thresh_root1_edit_Callback(hObject, eventdata, handles)
@@ -221,47 +299,20 @@ end
 
 % --- Executes during object creation, after setting all properties.
 function baseline1_edit_CreateFcn(hObject, eventdata, handles)
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
 end
-end
 
-%--------------------------------------------------------------------------
-
-
-
-function thresh_root2_edit_Callback(hObject, eventdata, handles)
+function root1_count_edit_Callback(hObject, eventdata, handles)
 end
 
 % --- Executes during object creation, after setting all properties.
-function thresh_root2_edit_CreateFcn(hObject, eventdata, handles)
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
+function root1_count_edit_CreateFcn(hObject, eventdata, handles)
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
 end
-end
-
-% --- Executes on button press in cursor_root2_button.
-function cursor_root2_button_Callback(hObject, eventdata, handles)
-    engRootCursorButton2;
-end
-
-% --- Executes on button press in set_root2_button.
-function set_root2_button_Callback(hObject, eventdata, handles)
-    engRootSetButton2;
-end
-
-% --- Executes on button press in manual_root2_button.
-function manual_root2_button_Callback(hObject, eventdata, handles)
-    engRootManualButton2;
-end
-
-% --- Executes on button press in erase_root2_button.
-function erase_root2_button_Callback(hObject, eventdata, handles)
-    engRootEraseButton2;
-end
-
-
-
 
 % -------------------------------------------------------------------------
 % ROOT 1 OUTPUT PANEL EDIT BOXES
@@ -302,75 +353,86 @@ function root1_avg_amp_edit_CreateFcn(hObject, eventdata, handles)
 end
 
 
-
+%--------------------------------------------------------------------------
+% ROOT 2 INPUT PANEL BUTTONS
 % -------------------------------------------------------------------------
-% SETTINGS BUTTON
-% -------------------------------------------------------------------------
-% --- Executes on button press in settings1_GUI_button.
-function settings1_GUI_button_Callback(hObject, eventdata, handles)
-    engSettings;
+% --- Executes on button press in set_root2_button.
+function set_root2_button_Callback(hObject, eventdata, handles)
+    identity = 2;
+    engRootSetButton;
 end
 
-
-% --- Executes on button press in settings2_GUI_button.
-function settings2_GUI_button_Callback(hObject, eventdata, handles)
-    engSettings2;
+% --- Executes on button press in cursor_root2_button.
+function cursor_root2_button_Callback(hObject, eventdata, handles)
+    identity = 2;
+    engRootCursorButton;
 end
 
-% -------------------------------------------------------------------------
-% CELL OUTPUT PANEL EDIT BOXES
-% -------------------------------------------------------------------------
-function cell_avg_dur_edit_Callback(hObject, eventdata, handles)
+% --- Executes on button press in manual_root2_button.
+function manual_root2_button_Callback(hObject, eventdata, handles)
+    identity = 2;
+    engRootManualButton;
 end
 
-% --- Executes during object creation, after setting all properties.
-function cell_avg_dur_edit_CreateFcn(hObject, eventdata, handles)
-    if ispc && isequal(get(hObject,'BackgroundColor'),...
-            get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
+% --- Executes on button press in erase_root2_button.
+function erase_root2_button_Callback(hObject, eventdata, handles)
+    identity = 2;
+    engRootEraseButton;
+end
+
+% --- Executes on button press in baseline2_button.
+function baseline2_button_Callback(hObject, eventdata, handles)
+    [x, y] = ginput(1);
+    try
+        delete(handles.base2)
+    catch err
     end
+    handles.baseline2 = y;
+    set(handles.baseline2_edit, 'String', handles.baseline2)
+    hold on;
+    handles.base2 = refline(0, handles.baseline2);
+    set(handles.base2, 'Color', 'r');
+    hold off;
+    guidata(hObject, handles);
 end
 
-function cell_avg_per_edit_Callback(hObject, eventdata, handles)
+% -------------------------------------------------------------------------
+% ROOT 2 INPUT PANEL EDIT BOXES
+% -------------------------------------------------------------------------
+function thresh_root2_edit_Callback(hObject, eventdata, handles)
 end
 
 % --- Executes during object creation, after setting all properties.
-function cell_avg_per_edit_CreateFcn(hObject, eventdata, handles)
-    if ispc && isequal(get(hObject,'BackgroundColor'),...
-            get(0,'defaultUicontrolBackgroundColor'))
+function thresh_root2_edit_CreateFcn(hObject, eventdata, handles)
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
     end
 end
 
-function onset_diff_edit_Callback(hObject, eventdata, handles)
+function baseline2_edit_Callback(hObject, eventdata, handles)
 end
 
 % --- Executes during object creation, after setting all properties.
-function onset_diff_edit_CreateFcn(hObject, eventdata, handles)
-    if ispc && isequal(get(hObject,'BackgroundColor'),...
-            get(0,'defaultUicontrolBackgroundColor'))
+function baseline2_edit_CreateFcn(hObject, eventdata, handles)
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
     end
 end
 
 
-% --------------------------------------------------------------------
-function file_menu_Callback(hObject, eventdata, handles)
-% hObject    handle to file_menu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+function root2_count_edit_Callback(hObject, eventdata, handles)
 end
 
-% --------------------------------------------------------------------
-function file_open_menu_Callback(hObject, eventdata, handles)
-% hObject    handle to file_open_menu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-    engFileImport;
+% --- Executes during object creation, after setting all properties.
+function root2_count_edit_CreateFcn(hObject, eventdata, handles)
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
 end
 
-
-
+% -------------------------------------------------------------------------
+% ROOT 2 OUTPUT PANEL EDIT BOXES
+% -------------------------------------------------------------------------
 function root2_avg_dur_edit_Callback(hObject, eventdata, handles)
 end
 
@@ -403,71 +465,16 @@ function root2_avg_amp_edit_CreateFcn(hObject, eventdata, handles)
     end
 end
 
-
-% --- Executes on button press in baseline2_button.
-function baseline2_button_Callback(hObject, eventdata, handles)
-    [x, y] = ginput(1);
-    handles.baseline2 = y;
-    guidata(hObject, handles);
-    set(handles.baseline2_edit, 'String', handles.baseline2)
-    hold on;
-    base = refline(0, handles.baseline2);
-    set(base, 'Color', 'r');
-    hold off;
+% -------------------------------------------------------------------------
+% SETTINGS BUTTON
+% -------------------------------------------------------------------------
+% --- Executes on button press in settings1_GUI_button.
+function settings1_GUI_button_Callback(hObject, eventdata, handles)
+    engSettings;
 end
 
 
-function baseline2_edit_Callback(hObject, eventdata, handles)
-end
-
-% --- Executes during object creation, after setting all properties.
-function baseline2_edit_CreateFcn(hObject, eventdata, handles)
-    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-        set(hObject,'BackgroundColor','white');
-    end
-end
-
-
-function root2_count_edit_Callback(hObject, eventdata, handles)
-end
-
-% --- Executes during object creation, after setting all properties.
-function root2_count_edit_CreateFcn(hObject, eventdata, handles)
-    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-        set(hObject,'BackgroundColor','white');
-    end
-end
-
-
-function cell_count_edit_Callback(hObject, eventdata, handles)
-end
-
-% --- Executes during object creation, after setting all properties.
-function cell_count_edit_CreateFcn(hObject, eventdata, handles)
-    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-        set(hObject,'BackgroundColor','white');
-    end
-end
-
-
-function root1_count_edit_Callback(hObject, eventdata, handles)
-end
-
-% --- Executes during object creation, after setting all properties.
-function root1_count_edit_CreateFcn(hObject, eventdata, handles)
-    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-        set(hObject,'BackgroundColor','white');
-    end
-end
-
-
-
-function offset_diff_edit_Callback(hObject, eventdata, handles)
-end
-
-% --- Executes during object creation, after setting all properties.
-function offset_diff_edit_CreateFcn(hObject, eventdata, handles)
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+% --- Executes on button press in settings2_GUI_button.
+function settings2_GUI_button_Callback(hObject, eventdata, handles)
+    engSettings2;
 end

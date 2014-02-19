@@ -14,7 +14,7 @@ if (button == 1)
     actualAmp = amp - handles.baseline2;
     ro2.plotMarkers;
     root.plotAmplitude(amp);
-    ro2.findDeletion(handles.percent, amp, period);
+    ro2.findDeletion(handles.percent2, amp, period);
     set(handles.root2_count_edit, 'String', count);
     set(handles.root2_avg_dur_edit, 'String', duration);
     set(handles.root2_avg_per_edit, 'String', period);

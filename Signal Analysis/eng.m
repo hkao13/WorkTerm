@@ -22,7 +22,7 @@ function varargout = eng(varargin)
 
 % Edit the above text to modify the response to help eng
 
-% Last Modified by GUIDE v2.5 14-Feb-2014 15:35:56
+% Last Modified by GUIDE v2.5 24-Feb-2014 10:24:35
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -92,8 +92,8 @@ function [timeOnsetDiff, timeOffsetDiff] = set_time_diff (handles)
     
     switch plot1
         case 1
-            firstPlotOnset = handles.cellOnset;
-            firstPlotOffset = handles.cellOffset;
+            firstPlotOnset = handles.cellOnset';
+            firstPlotOffset = handles.cellOffset';
         case 2
             firstPlotOnset = handles.rootOnset1;
             firstPlotOffset = handles.rootOffset1;
@@ -137,14 +137,73 @@ function [timeOnsetDiff, timeOffsetDiff] = set_time_diff (handles)
         rootOnset = secondPlotOnset(rootOnsetInd);
         cellOffset = firstPlotOffset(cellOffsetInd);
         rootOffset = secondPlotOffset(rootOffsetInd);
-        timeOnsetDiff = delta(cellOnset, rootOnset);
-        timeOffsetDiff = delta(cellOffset, rootOffset);
+        [timeOnsetDiff, timeOnsetDiffArray] = delta(cellOnset, rootOnset);
+        [timeOffsetDiff] = delta(cellOffset, rootOffset);
+        referencePeriod = diff(firstPlotOnset(cellOnsetInd));
     else
         msg3 = msgbox('Equal amount of bursts between both plots. Press O.K. to get result.');
         waitfor(msg3);
-        timeOnsetDiff = delta(firstPlotOnset, secondPlotOnset);
-        timeOffsetDiff = delta(firstPlotOffset, secondPlotOffset);
+        [timeOnsetDiff, timeOnsetDiffArray] = delta(firstPlotOnset, secondPlotOnset);
+        [timeOffsetDiff] = delta(firstPlotOffset, secondPlotOffset);
+        referencePeriod = diff(firstPlotOnset);
     end
+    
+    timeOnsetDiffArray(end) = [];
+    theta = (-2*pi*(timeOnsetDiffArray./referencePeriod)) + (pi/2);
+    radius = ones(numel(theta),1);
+    yBar = mean(sin(theta))
+    xBar = mean(cos(theta))
+    radiusBar = [0, sqrt((xBar^2) + (yBar^2))];
+    quadrant1 = ((xBar > 0) && (yBar > 0));
+    quadrant2 = ((xBar < 0) && (yBar > 0));
+    quadrant3 = ((xBar < 0) && (yBar < 0));
+    quadrant4 = ((xBar > 0) && (yBar < 0));
+    if (quadrant1 == 1)
+        thetaBar = [0, atan(yBar/xBar)];
+        angle = 90 - (thetaBar(:,2) * 180/pi);
+    elseif (quadrant2 == 1)
+        thetaBar = [0, atan(yBar/xBar) + pi];
+        angle = 360 - (thetaBar(:,2) * 180/pi) + 90;
+    elseif (quadrant3 == 1)
+        thetaBar = [0, atan(yBar/xBar) + pi];
+        angle = 360 - (thetaBar(:,2) * 180/pi) + 90;
+    elseif (quadrant4 == 1)
+        thetaBar = [0, atan(yBar/xBar)];
+        angle = abs(thetaBar(:,2) * 180/pi) + 90;
+    end
+    figure(99);
+
+    polar(theta, radius, 'r*');
+    hold on;
+    polar(thetaBar, radiusBar, '-ob');
+    
+    % Re-labling polar plot axis.
+    polarHandle = findall(gca, 'Type', 'Text');
+    polarString = get(polarHandle, 'String');
+    polarString(3:15) = {
+        'Polar Plot'
+        '90'
+        '270'
+        '120'
+        '300'
+        '150'
+        '330'
+        '180'
+        '0'
+        '210'
+        '30'
+        '240'
+        '60'
+        };
+    set(polarHandle, {'String'}, polarString);
+    txt = {'Angle of vector in degrees:', num2str(angle), '', 'Length of vector (Maximum = 1):' num2str(radiusBar(:,2))};
+    annotation('textbox', [0 0 0.2 0.35], 'String', txt);
+    %-------
+    hold off;
+
+    
+
+    
 end
 
 % -------------------------------------------------------------------------
@@ -173,8 +232,10 @@ function time_diff_button_Callback(hObject, eventdata, handles)
     
 end
 
-% --- Executes on button press in erase_cell_button.
-function erase_cell_button_Callback(hObject, eventdata, handles)
+% --- Executes on button press in cell_reset_button.
+function cell_reset_button_Callback(hObject, eventdata, handles)
+    identity = 0;
+    engResetButtons;
 end
 
 % -------------------------------------------------------------------------
@@ -270,14 +331,20 @@ function baseline1_button_Callback(hObject, eventdata, handles)
         delete(handles.base1);
     catch err
     end
-    handles.baseline1 = y;
-    set(handles.baseline1_edit, 'String', handles.baseline1)
+    set(handles.baseline1_edit, 'String', y);
+    handles.baseline1 = str2double(get(handles.baseline1_edit, 'String'));
     hold on;
     handles.base1 = refline(0, handles.baseline1);
     set(handles.base1, 'Color', 'r');
     hold off;
     guidata(hObject, handles);
     
+end
+
+% --- Executes on button press in root1_reset_button.
+function root1_reset_button_Callback(hObject, eventdata, handles)
+identity = 1;
+engResetButtons;
 end
 
 % -------------------------------------------------------------------------
@@ -387,13 +454,19 @@ function baseline2_button_Callback(hObject, eventdata, handles)
         delete(handles.base2)
     catch err
     end
-    handles.baseline2 = y;
-    set(handles.baseline2_edit, 'String', handles.baseline2)
+    set(handles.baseline2_edit, 'String', y);
+    handles.baseline2 = str2double(get(handles.baseline2_edit, 'String'));
     hold on;
     handles.base2 = refline(0, handles.baseline2);
     set(handles.base2, 'Color', 'r');
     hold off;
     guidata(hObject, handles);
+end
+
+% --- Executes on button press in root2_reset_button.
+function root2_reset_button_Callback(hObject, eventdata, handles)
+    identity = 2;
+    engResetButtons;
 end
 
 % -------------------------------------------------------------------------
@@ -478,3 +551,9 @@ end
 function settings2_GUI_button_Callback(hObject, eventdata, handles)
     engSettings2;
 end
+
+
+
+
+
+

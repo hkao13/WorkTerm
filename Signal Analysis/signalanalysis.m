@@ -18,7 +18,7 @@ classdef signalanalysis < handle
     
     methods (Static)
         
-        function plotAmplitude (amp)
+        function line = plotAmplitude (amp)
             hold on;
             line = refline (0, amp);
             set(line, 'Color', 'r')
@@ -72,40 +72,46 @@ classdef signalanalysis < handle
             plot(SA.onsetTimes, SA.threshold, '>',...
                 'MarkerSize', 8, 'MarkerEdgeColor', 'g',...
                 'MarkerFaceColor', 'g');
-             plot(SA.offsetTimes, SA.threshold, '<',...
-                 'MarkerSize', 8, 'MarkerEdgeColor', 'r',...
-                 'MarkerFaceColor', 'r');
+            plot(SA.offsetTimes, SA.threshold, '<',...
+                'MarkerSize', 8, 'MarkerEdgeColor', 'r',...
+                'MarkerFaceColor', 'r');
             hold off;
         end
         
         % calculates the average duration of each burst. The duration of a
         % burst is measured from the onset to the offset of that burst.
         function [averageBurstDuration, durationCount] = averageDuration(SA)
-            cumulativeBurstDuration = 0;
-            durationCount = 0;
-            for i = 1:numel(SA.onsetTimes) 
-                cumulativeBurstDuration = cumulativeBurstDuration +...
-                    SA.offsetTimes(i) -...
-                    SA.onsetTimes(i);
-                durationCount = durationCount + 1;
-            end
-            averageBurstDuration =...
-                cumulativeBurstDuration / durationCount;
+            %cumulativeBurstDuration = 0;
+            %durationCount = 0;
+            %for i = 1:numel(SA.onsetTimes) 
+            %    cumulativeBurstDuration = cumulativeBurstDuration +...
+            %        SA.offsetTimes(i) -...
+            %        SA.onsetTimes(i);
+            %    durationCount = durationCount + 1;
+            %end
+            %averageBurstDuration =...
+            %    cumulativeBurstDuration / durationCount;
+            burstDuration = SA.offsetTimes - SA.onsetTimes;
+            averageBurstDuration = mean(burstDuration);
+            durationCount = numel(burstDuration);
+            
         end
         
         function averageBurstPeriod = averagePeriod(SA)
-            cumulativeBurstPeriod = 0;
-            period_count = 0;
-            for i = 1:numel(SA.onsetTimes)
-                if ( i < numel(SA.onsetTimes) )
-                    cumulativeBurstPeriod = cumulativeBurstPeriod +...
-                        ( SA.onsetTimes(i + 1) -...
-                        SA.onsetTimes(i) );
-                    period_count = period_count + 1;
-                end
-            end
-            averageBurstPeriod =...
-                cumulativeBurstPeriod / period_count; 
+            %cumulativeBurstPeriod = 0;
+            %period_count = 0;
+            %for i = 1:numel(SA.onsetTimes)
+            %    if ( i < numel(SA.onsetTimes) )
+            %        cumulativeBurstPeriod = cumulativeBurstPeriod +...
+            %            ( SA.onsetTimes(i + 1) -...
+            %            SA.onsetTimes(i) );
+            %        period_count = period_count + 1;
+            %    end
+            %end
+            %averageBurstPeriod =...
+            %    cumulativeBurstPeriod / period_count;
+            
+            averageBurstPeriod = mean(diff(SA.onsetTimes));
         end
         
         % caluclates the average amplitude of all bursts in the data set.
@@ -139,11 +145,12 @@ classdef signalanalysis < handle
             else
                 percent = percent / 100;
             end
-            periodArray = zeros((numel(SA.onsetRevised) - 1):1);
-            for j = 2:numel(SA.onsetTimes)
-                periodArray(j-1) = SA.onsetTimes(j) -...
-                    SA.onsetTimes(j-1);
-            end
+            %periodArray = zeros((numel(SA.onsetRevised) - 1):1);
+            %for j = 2:numel(SA.onsetTimes)
+            %    periodArray(j-1) = SA.onsetTimes(j) -...
+            %        SA.onsetTimes(j-1);
+            %end
+            periodArray = diff(SA.onsetTimes);
             standardDev = std(periodArray);
             
             for i = 1:numel(SA.maxValuesArray)
@@ -156,12 +163,12 @@ classdef signalanalysis < handle
                         difference = SA.onsetTimes(i) - SA.onsetTimes(i-1);
                         upperBound = period + standardDev;
                         lowerBound = period - standardDev;
-                        if((difference > lowerBound) && (difference < upperBound))
+                       if((difference > lowerBound) && (difference < upperBound))
                             fprintf ('\nDeletion at: %f to %f,\nNon-Reseting\n', SA.onsetTimes(i), SA.offsetTimes(i));
                         elseif((difference < lowerBound) || (difference > upperBound))
                             fprintf ('\nDeletion at: %f to %f,\nReseting\n', SA.onsetTimes(i), SA.offsetTimes(i));
                         end
-                    end
+                   end
                     hold on;
                     plot(SA.onsetTimes(i), SA.threshold, 's',...
                         'MarkerSize', 10, 'MarkerEdgeColor', 'g',...
@@ -174,6 +181,7 @@ classdef signalanalysis < handle
           
                 end
             end
+            
         end
         
         function deleteBurst(SA, x)

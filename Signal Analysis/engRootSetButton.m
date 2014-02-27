@@ -49,7 +49,7 @@ period = ro.averagePeriod;
 amp = ro.averageAmplitude(baseline);
 actualAmp = amp - baseline;
 ro.plotMarkers;
-root.plotAmplitude(amp);
+handles.line = root.plotAmplitude(amp);
 ro.findDeletion(percent, amp, period);
 
 switch identity

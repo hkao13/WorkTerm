@@ -112,7 +112,6 @@ classdef root < signalanalysis
             RO.onsetRevised = on;
             RO.offsetRevised = off;
         end
-        
     end
     
 end

@@ -1,5 +1,22 @@
 clc;
-disp('Initializing/Reseting Data')
+disp('Initializing/Reseting Data');
+
+handles = defaultHandles;
+
+handles.spike    = getappdata(0, 'spike');
+handles.trough   = getappdata(0, 'trough');
+handles.burst    = getappdata(0, 'burst');
+handles.percent  = getappdata(0, 'percent');
+handles.spike2   = getappdata(0, 'spike2');
+handles.trough2  = getappdata(0, 'trough2');
+handles.burst2   = getappdata(0, 'burst2');
+handles.percent2 = getappdata(0, 'percent2');
+handles.span     = getappdata(0, 'span');
+handles.time     = getappdata(0, 'time');
+handles.cell     = getappdata(0, 'cell');
+handles.root1    = getappdata(0, 'root1');
+handles.root2    = getappdata(0, 'root2');
+
 set(handles.baseline1_edit, 'String', '');
 set(handles.thresh_root1_edit, 'String', '');
 set(handles.root1_count_edit, 'String', '');
@@ -24,24 +41,19 @@ threshold1 = str2double(get(handles.thresh_root1_edit, 'String'));
 threshold2 = str2double(get(handles.thresh_root2_edit, 'String'));
 span = getappdata(0, 'span');
 
-time = getappdata(0, 'time');
-cell = getappdata(0, 'cell');
-root1 = getappdata(0, 'root1');
-root2 = getappdata(0, 'root2');
-
 disp('Plotting Data...')
 
 axes(handles.axes3);
 cla;
-if (~isnan(cell))
-ce = cel(time, cell, NaN);
+if (~isnan(handles.cell))
+ce = cel(handles.time, handles.cell, NaN);
 ce.plotData;
 end
 
 axes(handles.axes2);
 cla;
-if(~isnan(root1))
-ro1 = root(time, root1, threshold1);
+if(~isnan(handles.root1))
+ro1 = root(handles.time, handles.root1, threshold1);
 ro1.bandpass;
 ro1.filterData(span);
 ro1.plotData;
@@ -49,8 +61,8 @@ end
 
 axes(handles.axes4);
 cla;
-if(~isnan(root2))
-ro2 = root(time, root2, threshold2);
+if(~isnan(handles.root2))
+ro2 = root(handles.time, handles.root2, threshold2);
 ro2.bandpass;
 ro2.filterData(span);
 ro2.plotData

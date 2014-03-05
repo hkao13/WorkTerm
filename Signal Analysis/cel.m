@@ -6,8 +6,15 @@ classdef cel < signalanalysis
     end
     
     methods
-        function CE = cel(time, potential, threshold)
-            CE = CE@signalanalysis(time, potential, threshold);
+        function CE = cel(time, potential, threshold, onsetTimes, offsetTimes)
+            if (nargin == 3)
+                superArgs{1} = [];
+                superArgs{2} = [];
+            else
+                superArgs{1} = onsetTimes;
+                superArgs{2} = offsetTimes;
+            end
+            CE = CE@signalanalysis(time, potential, threshold, superArgs{:});
         end
         
         function isBurst (CE, spikeThreshold, troughThreshold,...

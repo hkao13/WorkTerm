@@ -81,16 +81,6 @@ classdef signalanalysis < handle
         % calculates the average duration of each burst. The duration of a
         % burst is measured from the onset to the offset of that burst.
         function [averageBurstDuration, durationCount] = averageDuration(SA)
-            %cumulativeBurstDuration = 0;
-            %durationCount = 0;
-            %for i = 1:numel(SA.onsetTimes) 
-            %    cumulativeBurstDuration = cumulativeBurstDuration +...
-            %        SA.offsetTimes(i) -...
-            %        SA.onsetTimes(i);
-            %    durationCount = durationCount + 1;
-            %end
-            %averageBurstDuration =...
-            %    cumulativeBurstDuration / durationCount;
             burstDuration = SA.offsetTimes - SA.onsetTimes;
             averageBurstDuration = mean(burstDuration);
             durationCount = numel(burstDuration);
@@ -98,19 +88,6 @@ classdef signalanalysis < handle
         end
         
         function averageBurstPeriod = averagePeriod(SA)
-            %cumulativeBurstPeriod = 0;
-            %period_count = 0;
-            %for i = 1:numel(SA.onsetTimes)
-            %    if ( i < numel(SA.onsetTimes) )
-            %        cumulativeBurstPeriod = cumulativeBurstPeriod +...
-            %            ( SA.onsetTimes(i + 1) -...
-            %            SA.onsetTimes(i) );
-            %        period_count = period_count + 1;
-            %    end
-            %end
-            %averageBurstPeriod =...
-            %    cumulativeBurstPeriod / period_count;
-            
             averageBurstPeriod = mean(diff(SA.onsetTimes));
         end
         
@@ -145,11 +122,6 @@ classdef signalanalysis < handle
             else
                 percent = percent / 100;
             end
-            %periodArray = zeros((numel(SA.onsetRevised) - 1):1);
-            %for j = 2:numel(SA.onsetTimes)
-            %    periodArray(j-1) = SA.onsetTimes(j) -...
-            %        SA.onsetTimes(j-1);
-            %end
             periodArray = diff(SA.onsetTimes);
             standardDev = std(periodArray);
             
@@ -159,26 +131,40 @@ classdef signalanalysis < handle
                     off = SA.onsetTimes(i);
                     if (i == 1)
                         fprintf('Deletion at %f to %f,\nUnable to find deletion type\n', SA.onsetTimes(i), SA.offsetTimes(i))
+                        hold on;
+                        plot(SA.onsetTimes(i), SA.threshold, 's',...
+                            'MarkerSize', 10, 'MarkerEdgeColor', 'g',...
+                            'MarkerFaceColor', 'b');
+                        plot(SA.offsetTimes(i), SA.threshold, 's',...
+                            'MarkerSize', 10, 'MarkerEdgeColor', 'r',...
+                            'MarkerFaceColor', 'b');
+                        hold off;
                     else
                         difference = SA.onsetTimes(i) - SA.onsetTimes(i-1);
                         upperBound = period + standardDev;
                         lowerBound = period - standardDev;
-                       if((difference > lowerBound) && (difference < upperBound))
+                        if((difference > lowerBound) && (difference < upperBound))
                             fprintf ('\nDeletion at: %f to %f,\nNon-Reseting\n', SA.onsetTimes(i), SA.offsetTimes(i));
+                            hold on;
+                            plot(SA.onsetTimes(i), SA.threshold, 's',...
+                                'MarkerSize', 10, 'MarkerEdgeColor', 'g',...
+                                'MarkerFaceColor', 'c');
+                            plot(SA.offsetTimes(i), SA.threshold, 's',...
+                                'MarkerSize', 10, 'MarkerEdgeColor', 'r',...
+                                'MarkerFaceColor', 'c');
+                            hold off;
                         elseif((difference < lowerBound) || (difference > upperBound))
                             fprintf ('\nDeletion at: %f to %f,\nReseting\n', SA.onsetTimes(i), SA.offsetTimes(i));
+                            hold on;
+                            plot(SA.onsetTimes(i), SA.threshold, 's',...
+                                'MarkerSize', 10, 'MarkerEdgeColor', 'g',...
+                                'MarkerFaceColor', 'y');
+                            plot(SA.offsetTimes(i), SA.threshold, 's',...
+                                'MarkerSize', 10, 'MarkerEdgeColor', 'r',...
+                                'MarkerFaceColor', 'y');
+                            hold off;
                         end
-                   end
-                    hold on;
-                    plot(SA.onsetTimes(i), SA.threshold, 's',...
-                        'MarkerSize', 10, 'MarkerEdgeColor', 'g',...
-                        'MarkerFaceColor', 'b');
-                
-                    plot(SA.offsetTimes(i), SA.threshold, 's',...
-                        'MarkerSize', 10, 'MarkerEdgeColor', 'r',...
-                        'MarkerFaceColor', 'b');
-                    hold off;
-          
+                    end         
                 end
             end
             

@@ -22,7 +22,7 @@ function varargout = eng(varargin)
 
 % Edit the above text to modify the response to help eng
 
-% Last Modified by GUIDE v2.5 24-Feb-2014 10:24:35
+% Last Modified by GUIDE v2.5 05-Mar-2014 16:07:21
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -57,10 +57,11 @@ function eng_OpeningFcn(hObject, eventdata, handles, varargin)
 
 % Update handles structure
     guidata(hObject, handles);
-
+    setappdata(0, 'defaultHandles', handles)
+    initializeVar;
 % UIWAIT makes eng wait for user response (see UIRESUME)
 % uiwait(handles.eng);
-    initializeVar;
+    
 end
 
 % --- Outputs from this function are returned to the command line.
@@ -79,12 +80,189 @@ function file_menu_Callback(hObject, eventdata, handles)
 end
 
 % --------------------------------------------------------------------
-function file_open_menu_Callback(hObject, eventdata, handles)
+function file_load_menu_Callback(hObject, eventdata, handles)
     engFileImport;
 end
 
-function [timeOnsetDiff, timeOffsetDiff] = set_time_diff (handles)
+% --------------------------------------------------------------------
+function file_open_menu_Callback(hObject, eventdata, handles)
+    [fileName, pathName] = uigetfile('*.fig');
+    open(fullfile(pathName, fileName));
+    fprintf('File %s%s has been Opened.\n', pathName, fileName);
+%    data = load(fullfile(pathName, fileName));
+%     handles = getappdata(0, 'defaultHandles');
+%     handlesUser = data.handlesUser;
+% 
+%     fnames = fieldnames(handlesUser);
+%     for f = 1:numel(fnames)
+%         handles.(fnames{f}) = handlesUser.(fnames{f});
+%     end 
+%     
+%     plot_button_Callback(hObject, eventdata, handles)
+%     
+%     if (isfield(handles, 'spike'))
+%     setappdata(0, 'spike'   , handles.spike);
+%     end
+%     
+%     
+%     if (isfield(handles, 'trough'))
+%     setappdata(0, 'trough'  , handles.trough);
+%     end 
+%     
+%     if (isfield(handles, 'burst'))
+%     setappdata(0, 'burst'   , handles.burst);
+%     end
+%     
+%     if (isfield(handles, 'percent'))
+%     setappdata(0, 'percent' , handles.percent);
+%     end
+%     
+%     if (isfield(handles, 'spike2'))
+%     setappdata(0, 'spike2'   , handles.spike2);
+%     end
+%     
+%     if (isfield(handles, 'trough2'))
+%     setappdata(0, 'trough2'  , handles.trough2);
+%     end
+%     
+%     if (isfield(handles, 'burst2'))
+%     setappdata(0, 'burst2'   , handles.burst2);
+%     end
+%     
+%     if (isfield(handles, 'percent2'))
+%     setappdata(0, 'percent2' , handles.percent2);
+%     end
+% 
+%     if (isfield(handles, 'span'))
+%     setappdata(0, 'span'    , handles.span);
+%     end
+%     
+%     if (isfield(handles, 'time'))
+%     setappdata(0, 'time'    , handles.time);
+%     end
+%     
+%     if (isfield(handles, 'cell'))
+%     setappdata(0, 'cell'    , handles.cell);
+%     end
+%     
+%     if (isfield(handles, 'root1'))
+%     setappdata(0, 'root1'   , handles.root1);
+%     end
+%     
+%     if (isfield(handles, 'root2'))
+%     setappdata(0, 'root2'   , handles.root2);
+%     end
+%     
+%     if (isfield(handles, 'cellCount'))
+%         set(handles.cell_count_edit, 'String', handles.cellCount);
+%     end
+%     
+%     if (isfield(handles, 'cellDuration'))
+%         set(handles.cell_avg_dur_edit, 'String', handles.cellDuration);
+%     end
+%     
+%     if (isfield(handles, 'cellPeriod'))
+%         set(handles.cell_avg_per_edit, 'String', handles.cellPeriod);
+%     end
+%     
+%     if (isfield(handles, 'root1Count'))
+%         set(handles.root1_count_edit, 'String', handles.root1Count);
+%     end
+%     
+%     if (isfield(handles, 'root1Duration'))
+%         set(handles.root1_avg_dur_edit, 'String', handles.root1Duration);
+%     end
+%     
+%     if (isfield(handles, 'root1Period'))
+%         set(handles.root1_avg_per_edit, 'String', handles.root1Period);
+%     end
+%     
+%     if (isfield(handles, 'root1Amp'))
+%         set(handles.root1_avg_amp_edit, 'String', handles.root1Amp);
+%     end
+%     
+%     if (isfield(handles, 'root2Count'))
+%         set(handles.root1_count_edit, 'String', handles.root2Count);
+%     end
+%     
+%     if (isfield(handles, 'root2Duration'))
+%         set(handles.root1_avg_dur_edit, 'String', handles.root2Duration);
+%     end
+%     
+%     if (isfield(handles, 'root2Period'))
+%         set(handles.root1_avg_per_edit, 'String', handles.root2Period);
+%     end
+%     
+%     if (isfield(handles, 'root2Amp'))
+%         set(handles.root1_avg_amp_edit, 'String', handles.root2Amp);
+%     end
+%     
+%     if (isfield(handles, 'onsetDiff'))
+%         set(handles.onset_diff_edit, 'String', handles.onsetDiff);
+%     end
+%     
+%     if (isfield(handles, 'offsetDiff'))
+%        set(handles.offset_diff_edit, 'String', handles.offsetDiff);
+%     end
+%     
+%     if(isfield(handles, 'baseline1'))
+%         set(handles.baseline1_edit, 'String', handles.baseline1);
+%     end
+%     
+%     if(isfield(handles, 'baseline2'))
+%         set(handles.baseline2_edit, 'String', handles.baseline2);
+%     end
+%     
+%     if(isfield(handles, 'threshold1'))
+%         set(handles.thresh_root1_edit, 'String', handles.threshold1);
+%     end
+%     
+%     if(isfield(handles, 'threshold2'))
+%         set(handles.thresh_root2_edit, 'String', handles.threshold2);
+%     end
     
+end
+
+% --------------------------------------------------------------------
+function file_save_menu_Callback(hObject, eventdata, handles)
+    if (isfield(handles, 'file'))
+        
+        %handlesNames = fieldnames(handles);
+        %handlesValues = struct2cell(handles);
+        %ind = find(strcmp(handlesNames, 'output')) + 1;
+        %handlesNames = handlesNames(ind:end);
+        %handlesValues = handlesValues(ind:end);
+        %handlesUser = cell2struct(handlesValues, handlesNames);
+        hgsave(handles.eng, handles.file);
+        fprintf('Data has been saved.\n')
+    else
+        fprintf('No existing data file has been found, please Save As...\n')
+    end
+end
+
+% --------------------------------------------------------------------
+function file_saveas_menu_Callback(hObject, eventdata, handles)
+    [fileName, pathName] = uiputfile('*.fig');
+    handles.file = fullfile(pathName, fileName);
+    
+    %handlesNames = fieldnames(handles);
+    %handlesValues = struct2cell(handles);
+    %ind = find(strcmp(handlesNames, 'output')) + 1;
+    %handlesNames = handlesNames(ind:end);
+    %handlesValues = handlesValues(ind:end);
+    %handlesUser = cell2struct(handlesValues, handlesNames);
+    
+    hgsave(handles.eng, handles.file);
+    fprintf('Current work saved as, %s, in directory, %s\n', fileName, pathName);
+    guidata(hObject, handles);
+end
+
+% --------------------------------------------------------------------
+function figure_menu_Callback(hObject, eventdata, handles)
+end
+
+% --------------------------------------------------------------------
+function figure_polar_menu_Callback(hObject, eventdata, handles)
     fig = engSelectPlots;
     waitfor(fig);
     plot1 = getappdata(0, 'plot1');
@@ -114,13 +292,15 @@ function [timeOnsetDiff, timeOffsetDiff] = set_time_diff (handles)
         case 3
             secondPlotOnset = handles.rootOnset2;
             secondPlotOffset = handles.rootOffset2;
+        otherwise
+            fprinf('\nInvalid plot, Please choose again.\n')
     end
         
     if (numel(firstPlotOnset) ~= numel(secondPlotOnset))
-        msg1 = msgbox('Please select the bursts in the first plot using left click, then press ENTER when finished.');
+        msg1 = msgbox('Please select the bursts in the first (reference) plot using left click, then press ENTER when finished.\n WARNING: NUMBER OF SELECTED BURSTS IN THE REFERENCE AND MEASUREMENT PLOTS MUST BE THE SAME.');
         waitfor(msg1);
         [cellX, cellY] = ginput;
-        msg2 = msgbox('Please select the bursts in the second plot using left click, then press ENTER when finished.');
+        msg2 = msgbox('Please select the bursts in the second (measurement) plot using left click, then press ENTER when finished.\n WARNING: NUMBER OF SELECTED BURSTS IN THE REFERENCE AND MEASUREMENT PLOTS MUST BE THE SAME.');
         waitfor(msg2);
         [rootX, rootY] = ginput;
         cellOnsetInd = [];
@@ -138,21 +318,19 @@ function [timeOnsetDiff, timeOffsetDiff] = set_time_diff (handles)
         cellOffset = firstPlotOffset(cellOffsetInd);
         rootOffset = secondPlotOffset(rootOffsetInd);
         [timeOnsetDiff, timeOnsetDiffArray] = delta(cellOnset, rootOnset);
-        [timeOffsetDiff] = delta(cellOffset, rootOffset);
         referencePeriod = diff(firstPlotOnset(cellOnsetInd));
     else
-        msg3 = msgbox('Equal amount of bursts between both plots. Press O.K. to get result.');
+        msg3 = msgbox('Equal amount of bursts between both (reference and measurement) plots. Press O.K. to get result.');
         waitfor(msg3);
         [timeOnsetDiff, timeOnsetDiffArray] = delta(firstPlotOnset, secondPlotOnset);
-        [timeOffsetDiff] = delta(firstPlotOffset, secondPlotOffset);
         referencePeriod = diff(firstPlotOnset);
     end
     
     timeOnsetDiffArray(end) = [];
     theta = (-2*pi*(timeOnsetDiffArray./referencePeriod)) + (pi/2);
     radius = ones(numel(theta),1);
-    yBar = mean(sin(theta))
-    xBar = mean(cos(theta))
+    yBar = mean(sin(theta));
+    xBar = mean(cos(theta));
     radiusBar = [0, sqrt((xBar^2) + (yBar^2))];
     quadrant1 = ((xBar > 0) && (yBar > 0));
     quadrant2 = ((xBar < 0) && (yBar > 0));
@@ -196,14 +374,75 @@ function [timeOnsetDiff, timeOffsetDiff] = set_time_diff (handles)
         '60'
         };
     set(polarHandle, {'String'}, polarString);
-    txt = {'Angle of vector in degrees:', num2str(angle), '', 'Length of vector (Maximum = 1):' num2str(radiusBar(:,2))};
-    annotation('textbox', [0 0 0.2 0.35], 'String', txt);
+    txt = {'Reference Plot:', num2str(plot1), '', 'Measurement Plot:', num2str(plot2), '', 'Angle of vector in degrees:', num2str(angle), '', 'Length of vector (Maximum = 1):' num2str(radiusBar(:,2))};
+    annotation('textbox', [0 0 0.17 0.3], 'String', txt);
     %-------
     hold off;
-
+end
+% --------------------------------------------------------------------
+function [timeOnsetDiff, timeOffsetDiff] = set_time_diff (handles)    
+    fig = engSelectPlots;
+    waitfor(fig);
+    plot1 = getappdata(0, 'plot1');
+    plot2 = getappdata(0, 'plot2');
     
-
+    switch plot1
+        case 1
+            firstPlotOnset = handles.cellOnset';
+            firstPlotOffset = handles.cellOffset';
+        case 2
+            firstPlotOnset = handles.rootOnset1;
+            firstPlotOffset = handles.rootOffset1;
+        case 3
+            firstPlotOnset = handles.rootOnset2;
+            firstPlotOffset = handles.rootOffset2;
+        otherwise
+            fprinf('\nInvalid plot, Please choose again.\n')
+    end
     
+    switch plot2
+        case 1
+            secondPlotOnset = handles.cellOnset;
+            secondPlotOffset = handles.cellOffset;
+        case 2
+            secondPlotOnset = handles.rootOnset1;
+            secondPlotOffset = handles.rootOffset1;
+        case 3
+            secondPlotOnset = handles.rootOnset2;
+            secondPlotOffset = handles.rootOffset2;
+        otherwise
+            fprinf('\nInvalid plot, Please choose again.\n')
+    end
+        
+    if (numel(firstPlotOnset) ~= numel(secondPlotOnset))
+        msg1 = msgbox('Please select the bursts in the first (reference) plot using left click, then press ENTER when finished.\n WARNING: NUMBER OF SELECTED BURSTS IN THE REFERENCE AND MEASUREMENT PLOTS MUST BE THE SAME.');
+        waitfor(msg1);
+        [cellX, cellY] = ginput;
+        msg2 = msgbox('Please select the bursts in the second (measurement) plot using left click, then press ENTER when finished.\n WARNING: NUMBER OF SELECTED BURSTS IN THE REFERENCE AND MEASUREMENT PLOTS MUST BE THE SAME.');
+        waitfor(msg2);
+        [rootX, rootY] = ginput;
+        cellOnsetInd = [];
+        rootOnsetInd = [];
+        cellOffsetInd = [];
+        rootOffsetInd = [];
+        for i = 1:numel(cellX)
+            cellOnsetInd(end+1) = find(firstPlotOnset < cellX(i), 1, 'last');
+            rootOnsetInd(end+1) = find(secondPlotOnset < rootX(i), 1, 'last');
+            cellOffsetInd(end+1) = find(firstPlotOffset > cellX(i), 1, 'first');
+            rootOffsetInd(end+1) = find(secondPlotOffset > rootX(i), 1, 'first');
+        end
+        cellOnset = firstPlotOnset(cellOnsetInd);
+        rootOnset = secondPlotOnset(rootOnsetInd);
+        cellOffset = firstPlotOffset(cellOffsetInd);
+        rootOffset = secondPlotOffset(rootOffsetInd);
+        [timeOnsetDiff, timeOnsetDiffArray] = delta(cellOnset, rootOnset);
+        [timeOffsetDiff] = delta(cellOffset, rootOffset);
+    else
+        msg3 = msgbox('Equal amount of bursts between both (reference and measurement) plots. Press O.K. to get result.');
+        waitfor(msg3);
+        [timeOnsetDiff, timeOnsetDiffArray] = delta(firstPlotOnset, secondPlotOnset);
+        [timeOffsetDiff] = delta(firstPlotOffset, secondPlotOffset);
+    end
 end
 
 % -------------------------------------------------------------------------
@@ -212,6 +451,7 @@ end
 
 % --- Executes on button press in plot_button.
 function plot_button_Callback(hObject, eventdata, handles)
+    defaultHandles = getappdata(0, 'defaultHandles');
     engPlotButton;
 end
 
@@ -226,10 +466,10 @@ end
 
 % --- Executes on button press in time_diff_button.
 function time_diff_button_Callback(hObject, eventdata, handles)
-    [onsetDiff, offsetDiff] = set_time_diff(handles);
-    set(handles.onset_diff_edit, 'String', onsetDiff);
-    set(handles.offset_diff_edit, 'String', offsetDiff);
-    
+    [handles.onsetDiff, handles.offsetDiff] = set_time_diff(handles);
+    set(handles.onset_diff_edit, 'String', handles.onsetDiff);
+    set(handles.offset_diff_edit, 'String', handles.offsetDiff);
+    guidata(hObject, handles);
 end
 
 % --- Executes on button press in cell_reset_button.
@@ -339,6 +579,13 @@ function baseline1_button_Callback(hObject, eventdata, handles)
     hold off;
     guidata(hObject, handles);
     
+end
+
+% --- Executes on button press in view_baseline1.
+function view_baseline1_Callback(hObject, eventdata, handles)
+    axes(handles.axes2);
+    handles.base1 = refline(0, handles.baseline1);
+    set(handles.base1, 'Color', 'r');
 end
 
 % --- Executes on button press in root1_reset_button.
@@ -463,6 +710,14 @@ function baseline2_button_Callback(hObject, eventdata, handles)
     guidata(hObject, handles);
 end
 
+
+% --- Executes on button press in view_baseline2.
+function view_baseline2_Callback(hObject, eventdata, handles)
+    axes(handles.axes4);
+    handles.base2 = refline(0, handles.baseline2);
+    set(handles.base2, 'Color', 'r');
+end
+
 % --- Executes on button press in root2_reset_button.
 function root2_reset_button_Callback(hObject, eventdata, handles)
     identity = 2;
@@ -551,9 +806,3 @@ end
 function settings2_GUI_button_Callback(hObject, eventdata, handles)
     engSettings2;
 end
-
-
-
-
-
-

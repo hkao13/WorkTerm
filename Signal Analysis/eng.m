@@ -88,151 +88,12 @@ end
 function file_open_menu_Callback(hObject, eventdata, handles)
     [fileName, pathName] = uigetfile('*.fig');
     open(fullfile(pathName, fileName));
-    fprintf('File %s%s has been Opened.\n', pathName, fileName);
-%    data = load(fullfile(pathName, fileName));
-%     handles = getappdata(0, 'defaultHandles');
-%     handlesUser = data.handlesUser;
-% 
-%     fnames = fieldnames(handlesUser);
-%     for f = 1:numel(fnames)
-%         handles.(fnames{f}) = handlesUser.(fnames{f});
-%     end 
-%     
-%     plot_button_Callback(hObject, eventdata, handles)
-%     
-%     if (isfield(handles, 'spike'))
-%     setappdata(0, 'spike'   , handles.spike);
-%     end
-%     
-%     
-%     if (isfield(handles, 'trough'))
-%     setappdata(0, 'trough'  , handles.trough);
-%     end 
-%     
-%     if (isfield(handles, 'burst'))
-%     setappdata(0, 'burst'   , handles.burst);
-%     end
-%     
-%     if (isfield(handles, 'percent'))
-%     setappdata(0, 'percent' , handles.percent);
-%     end
-%     
-%     if (isfield(handles, 'spike2'))
-%     setappdata(0, 'spike2'   , handles.spike2);
-%     end
-%     
-%     if (isfield(handles, 'trough2'))
-%     setappdata(0, 'trough2'  , handles.trough2);
-%     end
-%     
-%     if (isfield(handles, 'burst2'))
-%     setappdata(0, 'burst2'   , handles.burst2);
-%     end
-%     
-%     if (isfield(handles, 'percent2'))
-%     setappdata(0, 'percent2' , handles.percent2);
-%     end
-% 
-%     if (isfield(handles, 'span'))
-%     setappdata(0, 'span'    , handles.span);
-%     end
-%     
-%     if (isfield(handles, 'time'))
-%     setappdata(0, 'time'    , handles.time);
-%     end
-%     
-%     if (isfield(handles, 'cell'))
-%     setappdata(0, 'cell'    , handles.cell);
-%     end
-%     
-%     if (isfield(handles, 'root1'))
-%     setappdata(0, 'root1'   , handles.root1);
-%     end
-%     
-%     if (isfield(handles, 'root2'))
-%     setappdata(0, 'root2'   , handles.root2);
-%     end
-%     
-%     if (isfield(handles, 'cellCount'))
-%         set(handles.cell_count_edit, 'String', handles.cellCount);
-%     end
-%     
-%     if (isfield(handles, 'cellDuration'))
-%         set(handles.cell_avg_dur_edit, 'String', handles.cellDuration);
-%     end
-%     
-%     if (isfield(handles, 'cellPeriod'))
-%         set(handles.cell_avg_per_edit, 'String', handles.cellPeriod);
-%     end
-%     
-%     if (isfield(handles, 'root1Count'))
-%         set(handles.root1_count_edit, 'String', handles.root1Count);
-%     end
-%     
-%     if (isfield(handles, 'root1Duration'))
-%         set(handles.root1_avg_dur_edit, 'String', handles.root1Duration);
-%     end
-%     
-%     if (isfield(handles, 'root1Period'))
-%         set(handles.root1_avg_per_edit, 'String', handles.root1Period);
-%     end
-%     
-%     if (isfield(handles, 'root1Amp'))
-%         set(handles.root1_avg_amp_edit, 'String', handles.root1Amp);
-%     end
-%     
-%     if (isfield(handles, 'root2Count'))
-%         set(handles.root1_count_edit, 'String', handles.root2Count);
-%     end
-%     
-%     if (isfield(handles, 'root2Duration'))
-%         set(handles.root1_avg_dur_edit, 'String', handles.root2Duration);
-%     end
-%     
-%     if (isfield(handles, 'root2Period'))
-%         set(handles.root1_avg_per_edit, 'String', handles.root2Period);
-%     end
-%     
-%     if (isfield(handles, 'root2Amp'))
-%         set(handles.root1_avg_amp_edit, 'String', handles.root2Amp);
-%     end
-%     
-%     if (isfield(handles, 'onsetDiff'))
-%         set(handles.onset_diff_edit, 'String', handles.onsetDiff);
-%     end
-%     
-%     if (isfield(handles, 'offsetDiff'))
-%        set(handles.offset_diff_edit, 'String', handles.offsetDiff);
-%     end
-%     
-%     if(isfield(handles, 'baseline1'))
-%         set(handles.baseline1_edit, 'String', handles.baseline1);
-%     end
-%     
-%     if(isfield(handles, 'baseline2'))
-%         set(handles.baseline2_edit, 'String', handles.baseline2);
-%     end
-%     
-%     if(isfield(handles, 'threshold1'))
-%         set(handles.thresh_root1_edit, 'String', handles.threshold1);
-%     end
-%     
-%     if(isfield(handles, 'threshold2'))
-%         set(handles.thresh_root2_edit, 'String', handles.threshold2);
-%     end
-    
+    fprintf('File %s%s has been Opened.\n', pathName, fileName);    
 end
 
 % --------------------------------------------------------------------
 function file_save_menu_Callback(hObject, eventdata, handles)
     if (isfield(handles, 'file'))
-        
-        %handlesNames = fieldnames(handles);
-        %handlesValues = struct2cell(handles);
-        %ind = find(strcmp(handlesNames, 'output')) + 1;
-        %handlesNames = handlesNames(ind:end);
-        %handlesValues = handlesValues(ind:end);
-        %handlesUser = cell2struct(handlesValues, handlesNames);
         hgsave(handles.eng, handles.file);
         fprintf('Data has been saved.\n')
     else
@@ -242,16 +103,8 @@ end
 
 % --------------------------------------------------------------------
 function file_saveas_menu_Callback(hObject, eventdata, handles)
-    [fileName, pathName] = uiputfile('*.fig');
+    [fileName, pathName] = uiputfile({'*.fig', 'MATLAB Figure (*.fig)'; '*.eps', 'Encapsulated PostScript (*.eps)'; '*.emf', 'Enhanced Metafile (*.emf)'});
     handles.file = fullfile(pathName, fileName);
-    
-    %handlesNames = fieldnames(handles);
-    %handlesValues = struct2cell(handles);
-    %ind = find(strcmp(handlesNames, 'output')) + 1;
-    %handlesNames = handlesNames(ind:end);
-    %handlesValues = handlesValues(ind:end);
-    %handlesUser = cell2struct(handlesValues, handlesNames);
-    
     hgsave(handles.eng, handles.file);
     fprintf('Current work saved as, %s, in directory, %s\n', fileName, pathName);
     guidata(hObject, handles);

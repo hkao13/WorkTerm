@@ -92,25 +92,35 @@ function file_open_menu_Callback(hObject, eventdata, handles)
 end
 
 % --------------------------------------------------------------------
+function file_save_menu_Callback(hObject, eventdata, handles)
+    if (isfield(handles, 'file'))
+        hgsave(handles.eng, handles.file);
+        fprintf('Data has been saved.\n')
+    else
+        fprintf('No existing data file has been found, please Save As...\n')
+    end
+end
+
+% --------------------------------------------------------------------
 function file_saveas_menu_Callback(hObject, eventdata, handles)
     [fileName, pathName] = uiputfile({'*.mat', 'MATLAB File (*.mat)'; '*.fig', 'MATLAB Figure (*.fig)'; '*.eps', 'Encapsulated PostScript (*.eps)'; '*.emf', 'Enhanced Metafile (*.emf)'});
     handles.file = fullfile(pathName, fileName);
     
-    search1 = strfind(fileName, '.mat');
-    search2 = strfind(fileName, '.fig');
-    search3 = strfind(fileName, '.eps');
-    search4 = strfind(fileName, '.emf');
+    %search1 = strfind(fileName, '.mat');
+    %search2 = strfind(fileName, '.fig');
+    %search3 = strfind(fileName, '.eps');
+    %search4 = strfind(fileName, '.emf');
     
-    notEmpty = (~isempty(search3)) || (~isempty(search4));
-    if (~isempty(search1))
-       save(handles.file);
-    elseif (notEmpty == 1)
-       saveas(handles.eng, handles.file);
-    elseif (~isempty(search2))
+    %notEmpty = (~isempty(search3)) || (~isempty(search4));
+    %if (~isempty(search1))
+    %    save(handles.file);
+    %elseif (notEmpty == 1)
+    %    saveas(handles.eng, handles.file);
+    %elseif (~isempty(search2))
         hgsave(handles.eng, handles.file);
-    else
-       return
-    end
+    %else
+    %    return
+    %end
     fprintf('Current work saved as, %s, in directory, %s\n', fileName, pathName);
     guidata(hObject, handles);
 end
@@ -127,120 +137,120 @@ function figure_polar_menu_Callback(hObject, eventdata, handles)
     if ( getappdata(0, 'userAccept') == 0 )
         return;
     elseif ( getappdata(0, 'userAccept') == 1 )
-        plot1 = getappdata(0, 'plot1');
-        plot2 = getappdata(0, 'plot2');
-
-        switch plot1
-            case 1
-                firstPlotOnset = handles.cellOnset;
-                firstPlotOffset = handles.cellOffset;
-            case 2
-                firstPlotOnset = handles.rootOnset1;
-                firstPlotOffset = handles.rootOffset1;
-            case 3
-                firstPlotOnset = handles.rootOnset2;
-                firstPlotOffset = handles.rootOffset2;
-            otherwise
-                fprinf('\nInvalid plot, Please choose again.\n')
+    plot1 = getappdata(0, 'plot1');
+    plot2 = getappdata(0, 'plot2');
+    
+    switch plot1
+        case 1
+            firstPlotOnset = handles.cellOnset;
+            firstPlotOffset = handles.cellOffset;
+        case 2
+            firstPlotOnset = handles.rootOnset1;
+            firstPlotOffset = handles.rootOffset1;
+        case 3
+            firstPlotOnset = handles.rootOnset2;
+            firstPlotOffset = handles.rootOffset2;
+        otherwise
+            fprinf('\nInvalid plot, Please choose again.\n')
+    end
+    
+    switch plot2
+        case 1
+            secondPlotOnset = handles.cellOnset;
+            secondPlotOffset = handles.cellOffset;
+        case 2
+            secondPlotOnset = handles.rootOnset1;
+            secondPlotOffset = handles.rootOffset1;
+        case 3
+            secondPlotOnset = handles.rootOnset2;
+            secondPlotOffset = handles.rootOffset2;
+        otherwise
+            fprinf('\nInvalid plot, Please choose again.\n')
+    end
+        
+    if (numel(firstPlotOnset) ~= numel(secondPlotOnset))
+        msg1 = msgbox({'Please select the bursts in the first (reference) plot using left click, then press ENTER when finished.', 'WARNING: NUMBER OF SELECTED BURSTS IN THE REFERENCE AND MEASUREMENT PLOTS MUST BE THE SAME.'});
+        waitfor(msg1);
+        [cellX, cellY] = ginput;
+        msg2 = msgbox({'Please select the bursts in the second (measurement) plot using left click, then press ENTER when finished.', 'WARNING: NUMBER OF SELECTED BURSTS IN THE REFERENCE AND MEASUREMENT PLOTS MUST BE THE SAME.'});
+        waitfor(msg2);
+        [rootX, rootY] = ginput;
+        cellOnsetInd = [];
+        rootOnsetInd = [];
+        cellOffsetInd = [];
+        rootOffsetInd = [];
+        for i = 1:numel(cellX)
+            cellOnsetInd(end+1) = find(firstPlotOnset < cellX(i), 1, 'last');
+            rootOnsetInd(end+1) = find(secondPlotOnset < rootX(i), 1, 'last');
+            cellOffsetInd(end+1) = find(firstPlotOffset > cellX(i), 1, 'first');
+            rootOffsetInd(end+1) = find(secondPlotOffset > rootX(i), 1, 'first');
         end
+        cellOnset = firstPlotOnset(cellOnsetInd);
+        rootOnset = secondPlotOnset(rootOnsetInd);
+        cellOffset = firstPlotOffset(cellOffsetInd);
+        rootOffset = secondPlotOffset(rootOffsetInd);
+        [timeOnsetDiff, timeOnsetDiffArray] = delta(cellOnset, rootOnset);
+        referencePeriod = diff(firstPlotOnset(cellOnsetInd));
+    else
+        msg3 = msgbox('Equal amount of bursts between both (reference and measurement) plots. Press O.K. to get result.');
+        waitfor(msg3);
+        [timeOnsetDiff, timeOnsetDiffArray] = delta(firstPlotOnset, secondPlotOnset);
+        referencePeriod = diff(firstPlotOnset);
+    end
+    
+    timeOnsetDiffArray(end) = [];
+    theta = (-2*pi*(timeOnsetDiffArray./referencePeriod)) + (pi/2);
+    radius = ones(1, numel(theta));
+    yBar = mean(sin(theta));
+    xBar = mean(cos(theta));
+    radiusBar = [0, sqrt((xBar^2) + (yBar^2))];
+    quadrant1 = ((xBar > 0) && (yBar > 0));
+    quadrant2 = ((xBar < 0) && (yBar > 0));
+    quadrant3 = ((xBar < 0) && (yBar < 0));
+    quadrant4 = ((xBar > 0) && (yBar < 0));
+    if (quadrant1 == 1)
+        thetaBar = [0, atan(yBar/xBar)];
+        angle = 90 - (thetaBar(:,2) * 180/pi);
+    elseif (quadrant2 == 1)
+        thetaBar = [0, atan(yBar/xBar) + pi];
+        angle = 360 - (thetaBar(:,2) * 180/pi) + 90;
+    elseif (quadrant3 == 1)
+        thetaBar = [0, atan(yBar/xBar) + pi];
+        angle = 360 - (thetaBar(:,2) * 180/pi) + 90;
+    elseif (quadrant4 == 1)
+        thetaBar = [0, atan(yBar/xBar)];
+        angle = abs(thetaBar(:,2) * 180/pi) + 90;
+    end
+    figure(99);
 
-        switch plot2
-            case 1
-                secondPlotOnset = handles.cellOnset;
-                secondPlotOffset = handles.cellOffset;
-            case 2
-                secondPlotOnset = handles.rootOnset1;
-                secondPlotOffset = handles.rootOffset1;
-            case 3
-                secondPlotOnset = handles.rootOnset2;
-                secondPlotOffset = handles.rootOffset2;
-            otherwise
-                fprinf('\nInvalid plot, Please choose again.\n')
-        end
-
-        if (numel(firstPlotOnset) ~= numel(secondPlotOnset))
-            msg1 = msgbox({'Please select the bursts in the first (reference) plot using left click, then press ENTER when finished.', 'WARNING: NUMBER OF SELECTED BURSTS IN THE REFERENCE AND MEASUREMENT PLOTS MUST BE THE SAME.'});
-            waitfor(msg1);
-            [cellX, cellY] = ginput;
-            msg2 = msgbox({'Please select the bursts in the second (measurement) plot using left click, then press ENTER when finished.', 'WARNING: NUMBER OF SELECTED BURSTS IN THE REFERENCE AND MEASUREMENT PLOTS MUST BE THE SAME.'});
-            waitfor(msg2);
-            [rootX, rootY] = ginput;
-            cellOnsetInd = [];
-            rootOnsetInd = [];
-            cellOffsetInd = [];
-            rootOffsetInd = [];
-            for i = 1:numel(cellX)
-                cellOnsetInd(end+1) = find(firstPlotOnset < cellX(i), 1, 'last');
-                rootOnsetInd(end+1) = find(secondPlotOnset < rootX(i), 1, 'last');
-                cellOffsetInd(end+1) = find(firstPlotOffset > cellX(i), 1, 'first');
-                rootOffsetInd(end+1) = find(secondPlotOffset > rootX(i), 1, 'first');
-            end
-            cellOnset = firstPlotOnset(cellOnsetInd);
-            rootOnset = secondPlotOnset(rootOnsetInd);
-            cellOffset = firstPlotOffset(cellOffsetInd);
-            rootOffset = secondPlotOffset(rootOffsetInd);
-            [timeOnsetDiff, timeOnsetDiffArray] = delta(cellOnset, rootOnset);
-            referencePeriod = diff(firstPlotOnset(cellOnsetInd));
-        else
-            msg3 = msgbox('Equal amount of bursts between both (reference and measurement) plots. Press O.K. to get result.');
-            waitfor(msg3);
-            [timeOnsetDiff, timeOnsetDiffArray] = delta(firstPlotOnset, secondPlotOnset);
-            referencePeriod = diff(firstPlotOnset);
-        end
-
-        timeOnsetDiffArray(end) = [];
-        theta = (-2*pi*(timeOnsetDiffArray./referencePeriod)) + (pi/2);
-        radius = ones(1, numel(theta));
-        yBar = mean(sin(theta));
-        xBar = mean(cos(theta));
-        radiusBar = [0, sqrt((xBar^2) + (yBar^2))];
-        quadrant1 = ((xBar > 0) && (yBar > 0));
-        quadrant2 = ((xBar < 0) && (yBar > 0));
-        quadrant3 = ((xBar < 0) && (yBar < 0));
-        quadrant4 = ((xBar > 0) && (yBar < 0));
-        if (quadrant1 == 1)
-            thetaBar = [0, atan(yBar/xBar)];
-            angle = 90 - (thetaBar(:,2) * 180/pi);
-        elseif (quadrant2 == 1)
-            thetaBar = [0, atan(yBar/xBar) + pi];
-            angle = 360 - (thetaBar(:,2) * 180/pi) + 90;
-        elseif (quadrant3 == 1)
-            thetaBar = [0, atan(yBar/xBar) + pi];
-            angle = 360 - (thetaBar(:,2) * 180/pi) + 90;
-        elseif (quadrant4 == 1)
-            thetaBar = [0, atan(yBar/xBar)];
-            angle = abs(thetaBar(:,2) * 180/pi) + 90;
-        end
-        figure(99);
-
-        polar(theta, radius, 'r*');
-        hold on;
-        polar(thetaBar, radiusBar, '-ob');
-
-        % Re-labling polar plot axis.
-        polarHandle = findall(gca, 'Type', 'Text');
-        polarString = get(polarHandle, 'String');
-        polarString(3:15) = {
-            'Polar Plot'
-            '90'
-            '270'
-            '120'
-            '300'
-            '150'
-            '330'
-            '180'
-            '0'
-            '210'
-            '30'
-            '240'
-            '60'
-            };
-        set(polarHandle, {'String'}, polarString);
-        txt = {'Reference Plot:', num2str(plot1), '', 'Measurement Plot:', num2str(plot2), '', 'Angle of vector in degrees:', num2str(angle), '', 'Length of vector (Maximum = 1):' num2str(radiusBar(:,2))};
-        annotation('textbox', [0 0 0.17 0.3], 'String', txt);
-        %-------
-        hold off;
-        end
+    polar(theta, radius, 'r*');
+    hold on;
+    polar(thetaBar, radiusBar, '-ob');
+    
+    % Re-labling polar plot axis.
+    polarHandle = findall(gca, 'Type', 'Text');
+    polarString = get(polarHandle, 'String');
+    polarString(3:15) = {
+        'Polar Plot'
+        '90'
+        '270'
+        '120'
+        '300'
+        '150'
+        '330'
+        '180'
+        '0'
+        '210'
+        '30'
+        '240'
+        '60'
+        };
+    set(polarHandle, {'String'}, polarString);
+    txt = {'Reference Plot:', num2str(plot1), '', 'Measurement Plot:', num2str(plot2), '', 'Angle of vector in degrees:', num2str(angle), '', 'Length of vector (Maximum = 1):' num2str(radiusBar(:,2))};
+    annotation('textbox', [0 0 0.17 0.3], 'String', txt);
+    %-------
+    hold off;
+    end
 end
 
 % --------------------------------------------------------------------
@@ -251,66 +261,66 @@ function [timeOnsetDiff, timeOffsetDiff] = set_time_diff (handles)
     if ( getappdata(0, 'userAccept') == 0 )
         return;
     elseif ( getappdata(0, 'userAccept') == 1 )
-        plot1 = getappdata(0, 'plot1');
-        plot2 = getappdata(0, 'plot2');
-
-        switch plot1
-            case 1
-                firstPlotOnset = handles.cellOnset;
-                firstPlotOffset = handles.cellOffset;
-            case 2
-                firstPlotOnset = handles.rootOnset1;
-                firstPlotOffset = handles.rootOffset1;
-            case 3
-                firstPlotOnset = handles.rootOnset2;
-                firstPlotOffset = handles.rootOffset2;
-            otherwise
-                fprinf('\nInvalid plot, Please choose again.\n')
+    plot1 = getappdata(0, 'plot1');
+    plot2 = getappdata(0, 'plot2');
+    
+    switch plot1
+        case 1
+            firstPlotOnset = handles.cellOnset;
+            firstPlotOffset = handles.cellOffset;
+        case 2
+            firstPlotOnset = handles.rootOnset1;
+            firstPlotOffset = handles.rootOffset1;
+        case 3
+            firstPlotOnset = handles.rootOnset2;
+            firstPlotOffset = handles.rootOffset2;
+        otherwise
+            fprinf('\nInvalid plot, Please choose again.\n')
+    end
+    
+    switch plot2
+        case 1
+            secondPlotOnset = handles.cellOnset;
+            secondPlotOffset = handles.cellOffset;
+        case 2
+            secondPlotOnset = handles.rootOnset1;
+            secondPlotOffset = handles.rootOffset1;
+        case 3
+            secondPlotOnset = handles.rootOnset2;
+            secondPlotOffset = handles.rootOffset2;
+        otherwise
+            fprinf('\nInvalid plot, Please choose again.\n')
+    end
+        
+    if (numel(firstPlotOnset) ~= numel(secondPlotOnset))
+        msg1 = msgbox({'Please select the bursts in the first (reference) plot using left click, then press ENTER when finished.', 'WARNING: NUMBER OF SELECTED BURSTS IN THE REFERENCE AND MEASUREMENT PLOTS MUST BE THE SAME.'});
+        waitfor(msg1);
+        [cellX, cellY] = ginput;
+        msg2 = msgbox({'Please select the bursts in the second (measurement) plot using left click, then press ENTER when finished.', 'WARNING: NUMBER OF SELECTED BURSTS IN THE REFERENCE AND MEASUREMENT PLOTS MUST BE THE SAME.'});
+        waitfor(msg2);
+        [rootX, rootY] = ginput;
+        cellOnsetInd = [];
+        rootOnsetInd = [];
+        cellOffsetInd = [];
+        rootOffsetInd = [];
+        for i = 1:numel(cellX)
+            cellOnsetInd(end+1) = find(firstPlotOnset < cellX(i), 1, 'last');
+            rootOnsetInd(end+1) = find(secondPlotOnset < rootX(i), 1, 'last');
+            cellOffsetInd(end+1) = find(firstPlotOffset > cellX(i), 1, 'first');
+            rootOffsetInd(end+1) = find(secondPlotOffset > rootX(i), 1, 'first');
         end
-
-        switch plot2
-            case 1
-                secondPlotOnset = handles.cellOnset;
-                secondPlotOffset = handles.cellOffset;
-            case 2
-                secondPlotOnset = handles.rootOnset1;
-                secondPlotOffset = handles.rootOffset1;
-            case 3
-                secondPlotOnset = handles.rootOnset2;
-                secondPlotOffset = handles.rootOffset2;
-            otherwise
-                fprinf('\nInvalid plot, Please choose again.\n')
-        end
-
-        if (numel(firstPlotOnset) ~= numel(secondPlotOnset))
-            msg1 = msgbox({'Please select the bursts in the first (reference) plot using left click, then press ENTER when finished.', 'WARNING: NUMBER OF SELECTED BURSTS IN THE REFERENCE AND MEASUREMENT PLOTS MUST BE THE SAME.'});
-            waitfor(msg1);
-            [cellX, cellY] = ginput;
-            msg2 = msgbox({'Please select the bursts in the second (measurement) plot using left click, then press ENTER when finished.', 'WARNING: NUMBER OF SELECTED BURSTS IN THE REFERENCE AND MEASUREMENT PLOTS MUST BE THE SAME.'});
-            waitfor(msg2);
-            [rootX, rootY] = ginput;
-            cellOnsetInd = [];
-            rootOnsetInd = [];
-            cellOffsetInd = [];
-            rootOffsetInd = [];
-            for i = 1:numel(cellX)
-                cellOnsetInd(end+1) = find(firstPlotOnset < cellX(i), 1, 'last');
-                rootOnsetInd(end+1) = find(secondPlotOnset < rootX(i), 1, 'last');
-                cellOffsetInd(end+1) = find(firstPlotOffset > cellX(i), 1, 'first');
-                rootOffsetInd(end+1) = find(secondPlotOffset > rootX(i), 1, 'first');
-            end
-            cellOnset = firstPlotOnset(cellOnsetInd);
-            rootOnset = secondPlotOnset(rootOnsetInd);
-            cellOffset = firstPlotOffset(cellOffsetInd);
-            rootOffset = secondPlotOffset(rootOffsetInd);
-            [timeOnsetDiff, timeOnsetDiffArray] = delta(cellOnset, rootOnset);
-            [timeOffsetDiff] = delta(cellOffset, rootOffset);
-        else
-            msg3 = msgbox('Equal amount of bursts between both (reference and measurement) plots. Press O.K. to get result.');
-            waitfor(msg3);
-            [timeOnsetDiff, timeOnsetDiffArray] = delta(firstPlotOnset, secondPlotOnset);
-            [timeOffsetDiff] = delta(firstPlotOffset, secondPlotOffset);
-        end
+        cellOnset = firstPlotOnset(cellOnsetInd);
+        rootOnset = secondPlotOnset(rootOnsetInd);
+        cellOffset = firstPlotOffset(cellOffsetInd);
+        rootOffset = secondPlotOffset(rootOffsetInd);
+        [timeOnsetDiff, timeOnsetDiffArray] = delta(cellOnset, rootOnset);
+        [timeOffsetDiff] = delta(cellOffset, rootOffset);
+    else
+        msg3 = msgbox('Equal amount of bursts between both (reference and measurement) plots. Press O.K. to get result.');
+        waitfor(msg3);
+        [timeOnsetDiff, timeOnsetDiffArray] = delta(firstPlotOnset, secondPlotOnset);
+        [timeOffsetDiff] = delta(firstPlotOffset, secondPlotOffset);
+    end
     end
 end
 

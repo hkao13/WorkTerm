@@ -22,7 +22,7 @@ function varargout = engSettings2(varargin)
 
 % Edit the above text to modify the response to help engSettings2
 
-% Last Modified by GUIDE v2.5 12-Feb-2014 13:46:42
+% Last Modified by GUIDE v2.5 11-Mar-2014 14:18:08
 
 % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
@@ -61,6 +61,10 @@ function engSettings2_OpeningFcn(hObject, eventdata, handles, varargin)
 
 % UIWAIT makes engSettings2 wait for user response (see UIRESUME)
 % uiwait(handles.engSettings2);
+set(handles.spike_thresh_edit, 'String', getappdata(0, 'spike2'));
+set(handles.trough_thresh_edit, 'String', getappdata(0, 'trough2'));
+set(handles.burst_thresh_edit, 'String', getappdata(0, 'burst2'));
+set(handles.del_percent_edit, 'String', getappdata(0, 'percent2'));
 end    
 
 % --- Outputs from this function are returned to the command line.
@@ -131,4 +135,16 @@ function del_percent_edit_CreateFcn(hObject, eventdata, handles)
             get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
     end
+end
+
+
+% --- Executes on button press in default_button.
+function default_button_Callback(hObject, eventdata, handles)
+% hObject    handle to default_button (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+set(handles.spike_thresh_edit, 'String', 0.05);
+set(handles.trough_thresh_edit, 'String', 0.20);
+set(handles.burst_thresh_edit, 'String', 0.70);
+set(handles.del_percent_edit, 'String', 50);
 end

@@ -101,8 +101,10 @@ plot1 = str2double(get(handles.first_plot_edit, 'String'));
 plot2 = str2double(get(handles.second_plot_edit, 'String'));
 setappdata(0, 'plot1', plot1);
 setappdata(0, 'plot2', plot2);
+setappdata(0, 'userAccept', 1);
 close(handles.engSelectPlots);
 
 % --- Executes on button press in cancel_button.
 function cancel_button_Callback(hObject, eventdata, handles)
+setappdata(0, 'userAccept', 0);
 close(handles.engSelectPlots);

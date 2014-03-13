@@ -5,11 +5,22 @@ function engRootErase( hObject, handles, mm, ax, baseline, identity, percent )
 if (button == 1)
     del_items = findobj(ax, 'Color', 'red', '-or', 'Color', 'blue',...
         '-or', 'Color', 'green', '-or', 'Color', 'm', '-or', 'Marker', '>', '-or',...
-        'Marker', '<', '-or', 'Marker', 's');
+        'Marker', '<', '-or', 'Marker', '+', '-or', 'Marker', 's');
     delete(del_items); 
     mm.deleteBurst(x);
     
     switch identity
+        case 0
+            [handles.cellDuration, handles.cellCount] = mm.averageDuration;
+            handles.cellPeriod = mm.averagePeriod;
+            mm.plotMarkers;
+            set(handles.cell_count_edit, 'String', handles.cellCount);
+            set(handles.cell_avg_dur_edit, 'String', handles.cellDuration);
+            set(handles.cell_avg_per_edit, 'String', handles.cellPeriod);
+            [cellOnset, cellOffset] = mm.returnBurstInfo;
+            handles.cellOnset = cellOnset;
+            handles.cellOffset = cellOffset;
+            guidata(hObject, handles);
         case 1
             [handles.root1Duration, handles.root1Count] = mm.averageDuration;
             amp = mm.averageAmplitude(baseline);
@@ -18,7 +29,6 @@ if (button == 1)
             mm.plotMarkers;
             handles.line1 = root.plotAmplitude(amp);
             mm.findDeletion(percent, amp, handles.root1Period);
-            handles.line1 = mm.plotAmplitude(amp);
             set(handles.root1_count_edit, 'String', handles.root1Count);
             set(handles.root1_avg_dur_edit, 'String', handles.root1Duration);
             set(handles.root1_avg_per_edit, 'String', handles.root1Period);

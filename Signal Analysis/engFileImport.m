@@ -22,7 +22,7 @@ function varargout = engFileImport(varargin)
 
 % Edit the above text to modify the response to help engFileImport
 
-% Last Modified by GUIDE v2.5 04-Mar-2014 13:27:31
+% Last Modified by GUIDE v2.5 11-Mar-2014 15:10:43
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -57,7 +57,6 @@ handles.output = hObject;
 
 % Update handles structure
 guidata(hObject, handles);
-
 % UIWAIT makes engFileImport wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 end
@@ -127,6 +126,7 @@ function import_button_Callback(hObject, eventdata, handles)
     first = str2double(get(handles.from_edit, 'String'));
     last = str2double(get(handles.to_edit, 'String'));
     span = str2double(get(handles.span_edit, 'String'));
+    factor = str2double(get(handles.downsample_edit, 'String'));
 
     if (isnan(first))
         first = 0;
@@ -169,6 +169,7 @@ function import_button_Callback(hObject, eventdata, handles)
             disp('No data sets were recognized, please try again.')
         end
 
+        setappdata(0, 'factor', factor)
         setappdata(0, 'span', span);
         setappdata(0, 'root1', root1);
         setappdata(0, 'root2', root2);
@@ -234,4 +235,33 @@ function span_edit_CreateFcn(hObject, eventdata, handles)
     if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
     end
+end
+
+
+
+function downsample_edit_Callback(hObject, eventdata, handles)
+
+end
+
+% --- Executes during object creation, after setting all properties.
+function downsample_edit_CreateFcn(hObject, eventdata, handles)
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+end
+
+
+% --------------------------------------------------------------------
+function tools_menu_Callback(hObject, eventdata, handles)
+% hObject    handle to tools_menu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+end
+
+% --------------------------------------------------------------------
+function filter_menu_Callback(hObject, eventdata, handles)
+% hObject    handle to filter_menu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+filterSettings;
 end

@@ -14,6 +14,8 @@ classdef signalanalysis < handle
         onsetRevised
         offsetRevised  
         maxValuesArray
+        onsetHandles = [];
+        offsetHandles = [];
     end
     
     methods (Static)
@@ -40,6 +42,7 @@ classdef signalanalysis < handle
             end
             SA.time = time;
             SA.potential = potential;
+            SA.potentialMod = potential;
             SA.threshold = threshold;
         end
         
@@ -69,12 +72,12 @@ classdef signalanalysis < handle
         function plotMarkers (SA)
             hold on;
             refline(0, SA.threshold);
-            plot(SA.onsetTimes, SA.threshold, '>',...
+            plot(SA.onsetTimes, SA.threshold, '+',...
                 'MarkerSize', 8, 'MarkerEdgeColor', 'g',...
-                'MarkerFaceColor', 'g');
-            plot(SA.offsetTimes, SA.threshold, '<',...
+                'MarkerFaceColor', 'g', 'LineWidth', 2);
+            plot(SA.offsetTimes, SA.threshold, '+',...
                 'MarkerSize', 8, 'MarkerEdgeColor', 'r',...
-                'MarkerFaceColor', 'r');
+                'MarkerFaceColor', 'r', 'LineWidth', 2);
             hold off;
         end
         
@@ -183,22 +186,46 @@ classdef signalanalysis < handle
             SA.onsetTimes(end+1) = x;
             SA.onsetTimes = sort(SA.onsetTimes, 'ascend');
             hold on;
-            plot(x, y, '>',...
+            markerHandle = plot(x, y, '+',...
                 'MarkerSize', 8, 'MarkerEdgeColor', 'g',...
-                'MarkerFaceColor', 'g');
+                'MarkerFaceColor', 'g', 'LineWidth', 2);
             hold off;
-            
+            SA.onsetHandles(end+1) = markerHandle;
         end
         
         function addBurstOffset(SA, x, y)
             SA.offsetTimes(end+1) = x;
             SA.offsetTimes = sort(SA.offsetTimes, 'ascend');
             hold on;
-            plot(x, y, '<',...
-                 'MarkerSize', 8, 'MarkerEdgeColor', 'r',...
-                 'MarkerFaceColor', 'r');
-             hold off;
+            markerHandle = plot(x, y, '+',...
+                'MarkerSize', 8, 'MarkerEdgeColor', 'r',...
+                'MarkerFaceColor', 'r', 'LineWidth', 2);
+            hold off;
+            SA.offsetHandles(end+1) = markerHandle;
         end
+        
+        function deleteBurstMarker(SA, clickHistory)
+            if (isempty(clickHistory))
+                errordlg('No more markers to delete.');
+            else
+                clickHandle = clickHistory(end);
+                if (mod(clickHandle, 2) == 0) %even for onsets
+                    hold on;
+                    delete(SA.onsetHandles(end));
+                    hold off;
+                    SA.onsetHandles(end) = [];
+                    SA.onsetTimes(end) = [];
+                elseif (mod(clickHandle, 2) == 1) %odd for offsets
+                    hold on;
+                    delete(SA.offsetHandles(end));
+                    hold off;
+                    SA.offsetHandles(end) = [];
+                    SA.offsetTimes(end) = [];
+                end
+            end
+        end
+                
+                
     end
     
 end

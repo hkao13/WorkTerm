@@ -2,6 +2,10 @@ switch identity
     case 0
         disp('Reseting Cell Data...');
         
+        if(isfield(handles, 'threshold0'))
+            handles = rmfield(handles, 'threshold0');
+        end
+        
         if(isfield(handles, 'cellOnset'))
             handles = rmfield(handles, 'cellOnset');
         end
@@ -30,21 +34,21 @@ switch identity
             handles = rmfield(handles, 'offsetDiff');
         end
         
+        set(handles.thresh_cell_edit, 'String', '');
         set(handles.cell_count_edit, 'String', '');
         set(handles.cell_avg_dur_edit, 'String', '');
         set(handles.cell_avg_per_edit, 'String', '');
         set(handles.onset_diff_edit, 'String', '');
         set(handles.offset_diff_edit, 'String', '');
         axes(handles.axes3);
-        cla;
-        if (~isnan(handles.cell))
-            ce = cel(handles.time, handles.cell, NaN);
-            ce.plotData;
-        end
+        del_items = findobj(handles.axes3, 'Color', 'red', '-or', 'Color', 'blue',...
+            '-or', 'Color', 'green', '-or', 'Color', 'm', '-or', 'Marker', '>', '-or',...
+            'Marker', '<', '-or', 'Marker', '+', '-or', 'Marker', 's');
+        delete(del_items);
         guidata(hObject, handles);
         
     case 1
-        disp('Reseting Root 1 Data');
+        disp('Reseting Root 1 Data...');
         
         if(isfield(handles, 'threshold1'))
             handles = rmfield(handles, 'threshold1');
@@ -96,17 +100,14 @@ switch identity
         set(handles.root1_count_edit, 'String', '');
         threshold1 = str2double(get(handles.thresh_root1_edit, 'String'));
         axes(handles.axes2);
-        cla;
-        if(~isnan(handles.root1))
-        ro1 = root(handles.time, handles.root1, threshold1);
-        ro1.bandpass;
-        ro1.filterData(handles.span);
-        ro1.plotData;
-        end
+        del_items = findobj(handles.axes2, 'Color', 'red', '-or', 'Color', 'blue',...
+            '-or', 'Color', 'green', '-or', 'Color', 'm', '-or', 'Marker', '>', '-or',...
+            'Marker', '<', '-or', 'Marker', '+', '-or', 'Marker', 's');
+        delete(del_items);
         guidata(hObject, handles);
         
     case 2
-        disp('Reseting Root 2 Data');
+        disp('Reseting Root 2 Data...');
        
         if(isfield(handles, 'threshold2'))
             handles = rmfield(handles, 'threshold2');
@@ -157,13 +158,10 @@ switch identity
         set(handles.root2_count_edit, 'String', '');
         threshold2 = str2double(get(handles.thresh_root2_edit, 'String'));
         axes(handles.axes4);
-        cla;
-        if(~isnan(handles.root2))
-        ro2 = root(handles.time, handles.root2, threshold2);
-        ro2.bandpass;
-        ro2.filterData(handles.span);
-        ro2.plotData
-        end
+        del_items = findobj(handles.axes4, 'Color', 'red', '-or', 'Color', 'blue',...
+            '-or', 'Color', 'green', '-or', 'Color', 'm', '-or', 'Marker', '>', '-or',...
+            'Marker', '<', '-or', 'Marker', '+', '-or', 'Marker', 's');
+        delete(del_items);
         guidata(hObject, handles);
 end
 

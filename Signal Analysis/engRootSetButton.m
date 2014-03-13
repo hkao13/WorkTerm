@@ -1,32 +1,45 @@
 switch identity
+    
     case 1
         ax = handles.axes2;
-        baseline = handles.baseline1;
+        if (~isfield(handles, 'baseline1'))
+            errordlg('Please select a baseline for Root 1.');
+            return;
+        else
+            baseline = handles.baseline1;
+        end
         handles.threshold1 = str2double(get(handles.thresh_root1_edit, 'String'));
-        time = handles.time;
-        potential = handles.root1;
-        span = handles.span;
-        spike = handles.spike;
-        trough = handles.trough;
-        burst = handles.burst;
-        percent = handles.percent;
+        time        = getappdata(0, 'time');
+        potential   = getappdata(0, 'root1');
+        span        = getappdata(0, 'span');
+        factor      = getappdata(0, 'factor');
+        spike       = getappdata(0, 'spike');
+        trough      = getappdata(0, 'trough');
+        burst       = getappdata(0, 'burst');
+        percent     = getappdata(0, 'percent');
         if ( isnan(handles.threshold1) )
             fprintf('\nPlease enter a value into the threshold edit box, then press SET.\n');
         else
             ro = root(time, potential, handles.threshold1);
         end
-           
+                
     case 2
         ax = handles.axes4;
-        baseline = handles.baseline2;
+        if (~isfield(handles, 'baseline2'))
+            errordlg('Please select a baseline for Root 2.');
+            return;
+        else
+            baseline = handles.baseline2;
+        end
         handles.threshold2 = str2double(get(handles.thresh_root2_edit, 'String'));
-        time = handles.time;
-        potential = handles.root2;
-        span = handles.span;
-        spike = handles.spike2;
-        trough = handles.trough2;
-        burst = handles.burst2;
-        percent = handles.percent2;
+        time        = getappdata(0, 'time');
+        potential   = getappdata(0, 'root2');
+        span        = getappdata(0, 'span');
+        factor      = getappdata(0, 'factor');
+        spike       = getappdata(0, 'spike2');
+        trough      = getappdata(0, 'trough2');
+        burst       = getappdata(0, 'burst2');
+        percent     = getappdata(0, 'percent2');
         if ( isnan(handles.threshold2) )
             fprintf('\nPlease enter a value into the threshold edit box, then press SET.\n');
         else
@@ -36,14 +49,14 @@ end
 
 del_items = findobj(ax, 'Color', 'red', '-or', 'Color', 'blue',...
     '-or', 'Color', 'green', '-or', 'Color', 'm', '-or', 'Marker', '>', '-or',...
-    'Marker', '<', '-or', 'Marker', 's');
+    'Marker', '<', '-or', 'Marker', '+', '-or', 'Marker', 's');
 delete(del_items);
 axes(ax);
-ro.bandpass;
+ro.bandpass(handles.filtOrder, handles.sampFrequency, handles.passFrequency);
+ro.downsample(factor);
 ro.filterData(span);
 ro.aboveThreshold;
 ro.isBurst(spike, trough, burst);
-ro.indexToTime;
 
 switch identity
     case 1

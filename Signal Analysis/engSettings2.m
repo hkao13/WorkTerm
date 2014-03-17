@@ -61,6 +61,9 @@ function engSettings2_OpeningFcn(hObject, eventdata, handles, varargin)
 
 % UIWAIT makes engSettings2 wait for user response (see UIRESUME)
 % uiwait(handles.engSettings2);
+
+% Sets the values of the edit boxes to the last entered values for spike,
+% trough, burst and percent thresholds.
 set(handles.spike_thresh_edit, 'String', getappdata(0, 'spike2'));
 set(handles.trough_thresh_edit, 'String', getappdata(0, 'trough2'));
 set(handles.burst_thresh_edit, 'String', getappdata(0, 'burst2'));
@@ -107,25 +110,6 @@ function burst_thresh_edit_CreateFcn(hObject, eventdata, handles)
     end
 end
 
-% --- Executes on button press in ok_button.
-function ok_button_Callback(hObject, eventdata, handles)
-    setappdata...
-        (0, 'spike2'  , str2double(get(handles.spike_thresh_edit , 'String')));
-    setappdata...
-        (0, 'trough2' , str2double(get(handles.trough_thresh_edit, 'String')));
-    setappdata...
-        (0, 'burst2'  , str2double(get(handles.burst_thresh_edit , 'String')));
-    setappdata...
-        (0, 'percent2', str2double(get(handles.del_percent_edit  , 'String')));
-end
-
-
-% --- Executes on button press in cancel_button.
-function cancel_button_Callback(hObject, eventdata, handles)
-    close(handles.engSettings);
-end
-
-
 function del_percent_edit_Callback(hObject, eventdata, handles)
 end
 
@@ -137,14 +121,30 @@ function del_percent_edit_CreateFcn(hObject, eventdata, handles)
     end
 end
 
+% --- Executes on button press in ok_button.
+function ok_button_Callback(hObject, eventdata, handles)
+    % Resets the MATLAB root values to the entered thresholds.
+    setappdata...
+        (0, 'spike2'  , str2double(get(handles.spike_thresh_edit , 'String')));
+    setappdata...
+        (0, 'trough2' , str2double(get(handles.trough_thresh_edit, 'String')));
+    setappdata...
+        (0, 'burst2'  , str2double(get(handles.burst_thresh_edit , 'String')));
+    setappdata...
+        (0, 'percent2', str2double(get(handles.del_percent_edit  , 'String')));
+end
 
 % --- Executes on button press in default_button.
 function default_button_Callback(hObject, eventdata, handles)
-% hObject    handle to default_button (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-set(handles.spike_thresh_edit, 'String', 0.05);
-set(handles.trough_thresh_edit, 'String', 0.20);
-set(handles.burst_thresh_edit, 'String', 0.70);
-set(handles.del_percent_edit, 'String', 50);
+    % Sets the values of the edit boxes to default threshold values.
+    set(handles.spike_thresh_edit, 'String', 0.05);
+    set(handles.trough_thresh_edit, 'String', 0.20);
+    set(handles.burst_thresh_edit, 'String', 0.70);
+    set(handles.del_percent_edit, 'String', 50);
+end
+
+% --- Executes on button press in cancel_button.
+function cancel_button_Callback(hObject, eventdata, handles)
+    % Does not set or reset any variables, just closes this GUI.
+    close(handles.engSettings);
 end

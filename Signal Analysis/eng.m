@@ -256,28 +256,28 @@ function [timeOnsetDiff, timeOffsetDiff] = set_time_diff (handles)
 
         switch plot1
             case 1
-                firstPlotOnset = handles.cellOnset;
-                firstPlotOffset = handles.cellOffset;
+                firstPlotOnset = handles.cellOnset(:);
+                firstPlotOffset = handles.cellOffset(:);
             case 2
-                firstPlotOnset = handles.rootOnset1;
-                firstPlotOffset = handles.rootOffset1;
+                firstPlotOnset = handles.rootOnset1(:);
+                firstPlotOffset = handles.rootOffset1(:);
             case 3
-                firstPlotOnset = handles.rootOnset2;
-                firstPlotOffset = handles.rootOffset2;
+                firstPlotOnset = handles.rootOnset2(:);
+                firstPlotOffset = handles.rootOffset2(:);
             otherwise
                 fprinf('\nInvalid plot, Please choose again.\n')
         end
 
         switch plot2
             case 1
-                secondPlotOnset = handles.cellOnset;
-                secondPlotOffset = handles.cellOffset;
+                secondPlotOnset = handles.cellOnset(:);
+                secondPlotOffset = handles.cellOffset(:);
             case 2
-                secondPlotOnset = handles.rootOnset1;
-                secondPlotOffset = handles.rootOffset1;
+                secondPlotOnset = handles.rootOnset1(:);
+                secondPlotOffset = handles.rootOffset1(:);
             case 3
-                secondPlotOnset = handles.rootOnset2;
-                secondPlotOffset = handles.rootOffset2;
+                secondPlotOnset = handles.rootOnset2(:);
+                secondPlotOffset = handles.rootOffset2(:);
             otherwise
                 fprinf('\nInvalid plot, Please choose again.\n')
         end

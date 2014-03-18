@@ -93,6 +93,7 @@ set(handles.cell_avg_per_edit,  'String', '');
 set(handles.cell_avg_dur_edit,  'String', '');
 set(handles.onset_diff_edit,    'String', '');
 set(handles.offset_diff_edit,   'String', '');
+set(handles.instructions_edit,  'String', '');
 
 % Getting parameters for initializing the signal analysis objects.
 threshold1 = str2double(get(handles.thresh_root1_edit, 'String'));

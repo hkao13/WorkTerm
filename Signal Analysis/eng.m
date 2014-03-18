@@ -29,7 +29,7 @@ function varargout = eng(varargin)
 
 % Edit the above text to modify the response to help eng
 
-% Last Modified by GUIDE v2.5 12-Mar-2014 13:10:29
+% Last Modified by GUIDE v2.5 18-Mar-2014 12:52:18
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -323,7 +323,8 @@ function figure_polar_menu_Callback(hObject, eventdata, handles)
             'Measurement Plot:', num2str(plot2), '',...
             'Angle of vector in degrees:', num2str(angle), '',...
             'Length of vector (Maximum = 1):' num2str(radiusBar(:,2))};
-        annotation('textbox', [0 0 0.17 0.3], 'String', txt);
+        ano = annotation('textbox', [0 0.5 0 0], 'String', txt);
+        set(ano, 'FitBoxToText', 'on', 'EdgeColor', 'none');
         hold off;
         
     end
@@ -912,4 +913,17 @@ end
 % Opens a settings GUI for the root 2 panels.
 function settings2_GUI_button_Callback(hObject, eventdata, handles)
     engSettings2;
+end
+
+
+
+function instructions_edit_Callback(hObject, eventdata, handles)
+end
+
+
+% --- Executes during object creation, after setting all properties.
+function instructions_edit_CreateFcn(hObject, eventdata, handles)
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
 end

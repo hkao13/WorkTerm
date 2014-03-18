@@ -1,3 +1,6 @@
+message = 'Press: Left Mouse to initiate Manual Mode; V button to set onset; B button to set offset; ENTER button to get results; Right Mouse to exit Manual.';
+set(handles.instructions_edit, 'String', message);
+
 % Switch block to determine which cursor button it was called from. 
 % Case 0 ---> cell.
 % Case 1 ---> root 1.
@@ -17,7 +20,7 @@ switch identity
         % them to determine bursts.
         time        = getappdata(0, 'time');
         potential   = getappdata(0, 'cell');
-        threshold   = NaN;
+        threshold   = str2double(get(handles.thresh_cell_edit, 'String'));
         baseline    = NaN;
         % Try-catch block determines if cellOnset and cellOffset already
         % exist within the GUI handle structure. If they do, manual mode
@@ -111,9 +114,12 @@ end
 evenHandle = 0;
 oddHandle = 1;
 clickHistory = [];
+yValues = [];
 
 % Sets the axes to plot on.
 axes(ax);
 % Starts the manual mode function.
 engRootManualMode( hObject, handles, identity, mm, baseline,...
-    clickHistory, evenHandle, oddHandle);
+    clickHistory, evenHandle, oddHandle, yValues);
+
+set(handles.instructions_edit, 'String', '');

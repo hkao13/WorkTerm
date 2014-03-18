@@ -130,7 +130,19 @@ classdef signalanalysis < handle
             if isempty(SA.potentialMod)
                 SA.potentialMod = SA.potential;
             end
+            
             plot (SA.time, SA.potentialMod, 'Color', 'k');
+%             XLim = get(gca, 'XLim');
+%             YLim = get(gca, 'YLim');
+%             start = [YLim(1):0.1:SA.potentialMod(1)]';
+%             stop = [YLim(1):0.1:SA.potentialMod(end)]';
+%             startTime = zeros(size(start));
+%             stopTime = ones(size(stop))*XLim(2);
+%             SA.time = vertcat(startTime, SA.time, stopTime);
+%             SA.potentialMod = vertcat(start, SA.potentialMod, stop);
+%             plot (SA.time, SA.potentialMod, 'Color', 'k');
+            %line ([XLim(1), XLim(1)], YLim, 'Color', 'k');
+            %line ([XLim(2), XLim(2)], YLim, 'Color', 'k');
             xlabel('Time (s)');
             ylabel('Voltage (mV)');
         end
@@ -182,19 +194,35 @@ classdef signalanalysis < handle
         %                         the recording relative to 0.
         % @modifies SA.maxValuesArray
         function averageAmp = averageAmplitude(SA, baseline)
+            % Preallocates array.
             maxValues = zeros(numel(SA.time):1);
             precision = 0.0001;
             for i = 1:numel(SA.onsetTimes)
+                % Onset of a burst rounded to precision.
                 start = round2(SA.onsetTimes(i), precision);
+                % Offset of s burst rounded to precision.
                 stop = round2(SA.offsetTimes(i), precision);
+                % Rounded SA.time vector to precison.
                 roundTime = round2(SA.time, precision);
+                % Finds all values of SA.potential that is between the
+                % onsets and offset of a burst.
                 value = abs(SA.potential...
                     (find(roundTime == start):find(roundTime == stop)));
+                % Gets average value of the all peaks in a burst. Peak is
+                % highest value of neighboring 3 points. This represents
+                % the average ampllitude of a signle burst.
                 peak = mean(findpeaks(value, 'MINPEAKDISTANCE', 3));
+                % Adds average amplitude of a single burst to maxValues
+                % array.
                 maxValues(i) = peak;  
             end
+            % Removes the preallocates zeros from maxValues array.
             maxValues = maxValues(maxValues ~= 0);
+            % True average amplitudes are the average burst amplitude -
+            % baseline. These values area stored in SA. maxValuesArray.
             SA.maxValuesArray = maxValues - baseline;
+            % averageAmp equals to the average of all average amplitude of
+            % all bursts.
             averageAmp = mean(maxValues);
         end
         
@@ -218,19 +246,27 @@ classdef signalanalysis < handle
         %                         baseline.
         % @param period:        Double values. Is that average period of
         %                         the burst in the recording.
-        function [on, off] = findDeletion (SA, percent, amp, period)
+        function findDeletion (SA, percent, amp, period)
+            % Default percent set to 50%
             if (isnan(percent))
                 percent = 0.50;
             else
                 percent = percent / 100;
             end
+            
+            % Finds period between every two onsets.
             periodArray = diff(SA.onsetTimes);
+            % Standard deviation of the periods.
             standardDev = std(periodArray);
             
+            % Loop through SA.maxValuesArray.
             for i = 1:numel(SA.maxValuesArray)
+                % Finds deletetions. Burst is deletetion is it is less than
+                % percent*amp.
                 if (SA.maxValuesArray(i) < (percent * amp))
-                    on = SA.onsetTimes(i);
-                    off = SA.onsetTimes(i);
+                    % Finds type of deletion. 
+                    % If fist burst is deletion, deletetion type unknown
+                    % since nothing to compare with.
                     if (i == 1)
                         fprintf('Deletion at %f to %f,\nUnable to find deletion type\n',...
                             SA.onsetTimes(i), SA.offsetTimes(i))
@@ -242,10 +278,13 @@ classdef signalanalysis < handle
                             'MarkerSize', 10, 'MarkerEdgeColor', 'r',...
                             'MarkerFaceColor', 'b');
                         hold off;
+                    
+                    % Otherwise deletions can be classified.
                     else
                         difference = SA.onsetTimes(i) - SA.onsetTimes(i-1);
                         upperBound = period + standardDev;
                         lowerBound = period - standardDev;
+                        % Non-reseting deletion.
                         if((difference > lowerBound) && (difference < upperBound))
                             fprintf ('\nDeletion at: %f to %f,\nNon-Reseting\n',...
                                 SA.onsetTimes(i), SA.offsetTimes(i));
@@ -257,6 +296,7 @@ classdef signalanalysis < handle
                                 'MarkerSize', 10, 'MarkerEdgeColor', 'r',...
                                 'MarkerFaceColor', 'c');
                             hold off;
+                        % Reseting deletion.   
                         elseif((difference < lowerBound) || (difference > upperBound))
                             fprintf ('\nDeletion at: %f to %f,\nReseting\n',...
                                 SA.onsetTimes(i), SA.offsetTimes(i));
@@ -268,22 +308,43 @@ classdef signalanalysis < handle
                                 'MarkerSize', 10, 'MarkerEdgeColor', 'r',...
                                 'MarkerFaceColor', 'y');
                             hold off;
+                            
                         end
-                    end         
+                        
+                    end
+                    
                 end
+                
             end
             
         end
         
-        function deleteBurst(SA, x)
+        % Deletes one detected whole burst from the recording.
+        % @param SA:            The signalanalysis class object.
+        % @param x:             Double value for the value inbetween the
+        %                         onset and the offset of the burst you
+        %                         want to delete.
+        function goAhead = deleteBurst(SA, x)
             onsetToDelete = x > SA.onsetTimes;
             offsetToDelete = x < SA.offsetTimes;
             ind1 = find(onsetToDelete, 1, 'last');
             ind2 = find(offsetToDelete, 1, 'first');
-            SA.onsetTimes(ind1) = [];
-            SA.offsetTimes(ind2) = [];
+            if (ind1 ~= ind2)
+                goAhead = 0;
+                return
+            else
+                SA.onsetTimes(ind1) = [];
+                SA.offsetTimes(ind2) = [];
+                goAhead = 1;
+            end
         end
         
+        % Manually adds a burst onset.
+        % @param SA:            The signalanalysis class object.
+        % @param x:             Double value for the x-axis value of the
+        %                         onset you want to add.
+        % @param y:             Double value for the y-axis value of the
+        %                         onset you want to add.
         function addBurstOnset(SA, x, y)
             SA.onsetTimes(end+1) = x;
             SA.onsetTimes = sort(SA.onsetTimes, 'ascend');
@@ -295,6 +356,12 @@ classdef signalanalysis < handle
             SA.onsetHandles(end+1) = markerHandle;
         end
         
+        % Manually adds a burst offset.
+        % @param SA:            The signalanalysis class object.
+        % @param x:             Double value for the x-axis value of the
+        %                         offset you want to add.
+        % @param y:             Double value for the y-axis value of the
+        %                         offset you want to add.
         function addBurstOffset(SA, x, y)
             SA.offsetTimes(end+1) = x;
             SA.offsetTimes = sort(SA.offsetTimes, 'ascend');
@@ -306,6 +373,12 @@ classdef signalanalysis < handle
             SA.offsetHandles(end+1) = markerHandle;
         end
         
+        % Deletes a manually added burst onset or offset.
+        % @param SA:            The signalanalysis class object.
+        % @param clickHistory:  Array of double values the contains
+        %                         even and odd numbers to represent all
+        %                         consecutive button clicks that adds
+        %                         onsets and offsets.
         function deleteBurstMarker(SA, clickHistory)
             if (isempty(clickHistory))
                 errordlg('No more markers to delete.');

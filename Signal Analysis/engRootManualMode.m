@@ -1,5 +1,5 @@
 function engRootManualMode( hObject, handles, identity, mm, baseline,...
-    clickHistory, evenHandle, oddHandle)
+    clickHistory, evenHandle, oddHandle, yValues)
 % engRootManualMode is the function that plots and performs the
 % computations based on user clicks for onset and offsets of bursts.
 %
@@ -49,7 +49,7 @@ function engRootManualMode( hObject, handles, identity, mm, baseline,...
     OFFSETBUTTON = 98;
     BACKSPACE = 8;
     % ---------------------------------------------------------------------
-
+    
     % Brings up cursor on the figure.
     [x, y, button] = ginput(1);
     
@@ -58,7 +58,7 @@ function engRootManualMode( hObject, handles, identity, mm, baseline,...
         fprintf('Manual Starting.\n');
         % Recursive.
         engRootManualMode(hObject, handles, identity, mm, baseline,...
-            clickHistory,  evenHandle, oddHandle);
+            clickHistory,  evenHandle, oddHandle, yValues);
     end
     
     % Onset button press to perform the onset plotting operations.
@@ -70,9 +70,10 @@ function engRootManualMode( hObject, handles, identity, mm, baseline,...
         evenHandle = evenHandle + 2;
         % Calls addBurstOnset method in signalanalysis.
         mm.addBurstOnset(x, y);
+        yValues(end + 1) = y;
         % Recursive.
         engRootManualMode(hObject, handles, identity, mm, baseline,...
-            clickHistory,  evenHandle, oddHandle);
+            clickHistory,  evenHandle, oddHandle, yValues);
     
     % Offset button press to perform the offset plotting operations.
     elseif (button == OFFSETBUTTON)
@@ -83,9 +84,10 @@ function engRootManualMode( hObject, handles, identity, mm, baseline,...
         oddHandle = oddHandle + 2;
         % Calls addBurstOffset method in signalanalysis.
         mm.addBurstOffset(x, y);
+        yValues(end + 1) = y;
         % Recursive.
         engRootManualMode(hObject, handles, identity, mm, baseline,...
-            clickHistory,  evenHandle, oddHandle);
+            clickHistory,  evenHandle, oddHandle, yValues);
         
     % Backspace press to delete previouslt plotted onset or offset.    
     elseif (button == BACKSPACE)
@@ -101,7 +103,7 @@ function engRootManualMode( hObject, handles, identity, mm, baseline,...
             clickHistory(end) = [];
             % Recursive.
             engRootManualMode(hObject, handles, identity, mm, baseline,...
-                clickHistory,  evenHandle, oddHandle);
+                clickHistory,  evenHandle, oddHandle, yValues);
         end
         
     % If button is empty (ENTER key press), it will return the results.
@@ -122,6 +124,14 @@ function engRootManualMode( hObject, handles, identity, mm, baseline,...
                 % Creates or refreshes the *Onset and *Offset fields in the
                 % handles structure of the GUI.
                 [handles.cellOnset, handles.cellOffset] = mm.returnBurstInfo;
+                
+                threshold = str2double(get(handles.thresh_cell_edit, 'String'));
+                if(isnan(threshold))
+                    set(handles.thresh_cell_edit, 'String', mean(yValues));
+                    hold on
+                    refline(0, mean(yValues));
+                    hold off
+                end
 
             % Case 1 for root 1
             case 1
@@ -159,6 +169,14 @@ function engRootManualMode( hObject, handles, identity, mm, baseline,...
                 handles.rootOnset1 = rootOnset1;
                 handles.rootOffset1 = rootOffset1;
                 
+                threshold = str2double(get(handles.thresh_root1_edit, 'String'));
+                if(isnan(threshold))
+                    set(handles.thresh_root1_edit, 'String', mean(yValues));
+                    hold on
+                    refline(0, mean(yValues));
+                    hold off
+                end
+                
             case 2
                 % Try-catch block trys to find line2 (average amplitude
                 % graphic object for root 2) in the handles structure, if
@@ -191,6 +209,14 @@ function engRootManualMode( hObject, handles, identity, mm, baseline,...
                 % handles structure of the GUI.
                 handles.rootOnset2 = rootOnset2;
                 handles.rootOffset2 = rootOffset2;
+                
+                threshold = str2double(get(handles.thresh_root2_edit, 'String'));
+                if(isnan(threshold))
+                    set(handles.thresh_root2_edit, 'String', mean(yValues));
+                    hold on
+                    refline(0, mean(yValues));
+                    hold off
+                end
                 
         end
         

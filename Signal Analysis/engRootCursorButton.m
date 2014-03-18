@@ -1,3 +1,6 @@
+message = 'Press: Left Mouse to set threshold; Right Mouse to exit Cursor.';
+set(handles.instructions_edit, 'String', message);
+
 % Initiates ginput which is a crosshair that lets the user pick a point on
 % a figure. This ginput allows only one button click and returns the x and
 % y values along with the value of the button that was clicked.
@@ -201,3 +204,5 @@ if (button == 1)
             cursor_root2_button_Callback(hObject, eventdata, handles);
     end
 end
+
+set(handles.instructions_edit, 'String', '');

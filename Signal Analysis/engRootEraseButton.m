@@ -1,3 +1,6 @@
+message = 'Press: Left Mouse between an onset and offset to erase burst; Right Mouse to exit Erase.';
+set(handles.instructions_edit, 'String', message);
+
 % Switch block to determine which cursor button it was called from. 
 % Case 0 ---> cell.
 % Case 1 ---> root 1.
@@ -101,3 +104,5 @@ end
 % Makes ax axes the current axes and initializes the engRootErase fucntion.
 axes(ax);
 engRootErase(hObject, handles, mm, ax, baseline, identity, percent)
+
+set(handles.instructions_edit, 'String', '');

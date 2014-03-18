@@ -106,6 +106,14 @@ classdef cel < signalanalysis
                 CE.onsetTimes = on;
                 CE.offsetTimes = off;
                 
+%                 fixStart = [min(CE.potentialMod):0.1:CE.potentialMod(1)]';
+%                 fixStop  = [min(CE.potentialMod):0.1:CE.potentialMod(end)]';
+%                 fixStartTime = zeros(size(fixStart));
+%                 fixStopTime  = ones(size(fixStop))*CE.time(end);
+%                 time = vertcat(fixStartTime, CE.time, fixStopTime);
+%                 potentialMod = vertcat(fixStart, CE.potentialMod, fixStop);
+                
+                
             % If error is produced, error dialog box will appear.
             catch err
                 msg = {'Error in detecting bursts for cell.',...

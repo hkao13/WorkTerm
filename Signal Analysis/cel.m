@@ -1,11 +1,31 @@
 classdef cel < signalanalysis
-    %UNTITLED3 Summary of this class goes here
-    %   Detailed explanation goes here
+    % cel class locates the bursts in the cell recordings.
+    % 
+    % cel is a subclass of signalanalysis.
+    %
+    % METHODS -------------------------------------------------------------
+    % NAME          DESCRIPTION
+    % cel           Class constructor.
+    % isBurst       Finds the bursts in the root data.
+    %
+    % ---------------------------------------------------------------------
     
     properties
     end
     
     methods
+        
+        % Class constructor or the cel class. 
+        % @param time:          Time data set for the eng.
+        % @param potential:     Voltages data set for the root reading of
+        %                         the eng.
+        % @param threshold:     Double value for a voltage level to detect
+        %                         bursts.
+        % @param onsetTimes:    An existing set of values of the times of
+        %                         onsets.
+        % @param offsetTimes:   An existing set of values of the times of
+        %                         offsets.
+        % @returns CE:          Class object.
         function CE = cel(time, potential, threshold, onsetTimes, offsetTimes)
             if (nargin == 3)
                 superArgs{1} = [];
@@ -17,9 +37,25 @@ classdef cel < signalanalysis
             CE = CE@signalanalysis(time, potential, threshold, superArgs{:});
         end
         
+        % Determines bursts in the data sets base on 3 threshold values.
+        % @param RO:                The root class object.
+        % @param spikeThreshold:    Double value, a minimum threshold.
+        %                             Anything greate than this threshold
+        %                             is considered to be a possible part
+        %                             of a burst.
+        % @param throughThreshold:  Double value, a maximum threshold.
+        %                             trough occurs between two spikes. If
+        %                             trough is less than threshold, the
+        %                             spikes are grouped to be a possible
+        %                             burst.
+        % @param burstThreshold:    Double value, a maximum threshold. If a
+        %                             possible burst is less the this
+        %                             threshold, then it is excluded,
+        %                             otherwise it is consdered a burst.
         function isBurst (CE, spikeThreshold, troughThreshold,...
                 burstThreshold)
             
+            % Sets default values for the parameters if they are NsN.
             if (isnan(spikeThreshold))
                 spikeThreshold = 0.005;
             end
@@ -69,18 +105,18 @@ classdef cel < signalanalysis
                 off(ind6) = [];
                 CE.onsetTimes = on;
                 CE.offsetTimes = off;
+                
+            % If error is produced, error dialog box will appear.
             catch err
-                msg = {'Error in detecting bursts for cell.', '1. Try another threshold level.', '2. Try another data time frame.', '3. Adjust cell input settings.'};
+                msg = {'Error in detecting bursts for cell.',...
+                    '1. Try another threshold level.',...
+                    '2. Try another data time frame.',...
+                    '3. Adjust cell input settings.'};
                 errordlg(msg);
             end
+            
         end
         
-        % removes unwanted bursts that are considered as noise from the
-        % onset of offset data sets.
-        function removeBurst (CE, index)
-            CE.onsetRevised(index) = [];
-            CE.offsetRevised(index) = [];
-        end
     end
     
 end

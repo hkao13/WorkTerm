@@ -13,7 +13,7 @@ switch identity
         % Cell data on axes3 of the GUI.
         ax = handles.axes3;
         % Gets the time, potential, threshold and baseline. Threshold and
-        % baseline are set to NsN because the cell object does not need
+        % baseline are set to NaN because the cell object does not need
         % them to determine bursts.
         time        = getappdata(0, 'time');
         potential   = getappdata(0, 'cell');

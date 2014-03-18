@@ -216,8 +216,7 @@ classdef signalanalysis < handle
         % @param amp:           Double value. Is the average amplitude of
         %                         the recording that is reference from the 
         %                         baseline.
-        % @param period:        Double values. Is that average period of
-        %                         the burst in the recording.
+        % @param period:        Double values. IS that average 
         function [on, off] = findDeletion (SA, percent, amp, period)
             if (isnan(percent))
                 percent = 0.50;

@@ -1,7 +1,7 @@
 function engRootManualMode( hObject, handles, identity, mm, baseline,...
     clickHistory, evenHandle, oddHandle)
-% engRootManualMode is the function that plots and performs the computations
-% based on user clicks for onset and offsets of bursts. 
+% engRootManualMode is the function that plots and performs the
+% computations based on user clicks for onset and offsets of bursts.
 %
 % INPUT VARIABLES ---------------------------------------------------------
 % NAME              TYPE            DESCRIPTION
@@ -47,7 +47,7 @@ function engRootManualMode( hObject, handles, identity, mm, baseline,...
     LEFTMOUSE = 1;
     ONSETBUTTON = 118;
     OFFSETBUTTON = 98;
-    BACKSPACE = 9;
+    BACKSPACE = 8;
     % ---------------------------------------------------------------------
 
     % Brings up cursor on the figure.
@@ -92,6 +92,7 @@ function engRootManualMode( hObject, handles, identity, mm, baseline,...
         % If clickHistory is not empty, meaning that there are onsets and
         % offsets plotted, it will delete the previously plotted onset or
         % offset.
+        
         if (~isempty(clickHistory))
             % Calls deleteBurstMarker method in signalanalysis.
             mm.deleteBurstMarker(clickHistory);

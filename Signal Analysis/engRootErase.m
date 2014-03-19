@@ -18,6 +18,7 @@ function engRootErase( hObject, handles, mm, ax, baseline, identity, percent )
 %                                     Cell   ---> 0
 %                                     Root 1 ---> 1
 %                                     Root 2 ---> 2
+%                                     Root 3 ---> 3
 % percent           double          Percent threshold setting used in the
 %                                     findDeletinons method of
 %                                     signalanalysis.
@@ -132,6 +133,34 @@ if (button == 1)
                 % Creates or refreshes the *Onset and *Offset fields in the
                 % handles structure of the GUI.
                 [handles.rootOnset2, handles.rootOffset2] = mm.returnBurstInfo;
+                
+            % Case 3 for root 3 data.    
+            case 3
+                % Gets burst duration and burst count from averageDuration
+                % method in signalanalysis.
+                [handles.root3Duration, handles.root3Count] = mm.averageDuration;
+                % Gets amp value that is referenced from 0 from
+                % averageAmplitude method in signalanalysis.
+                amp = mm.averageAmplitude(baseline);
+                % Gets burst period from averagePeriod method in
+                % signalanalysis
+                handles.root3Period = mm.averagePeriod;
+                % True amplitude is amp subtract baseline
+                handles.root3Amp = amp - baseline;
+                % Plots the markers.
+                mm.plotMarkers;
+                handles.line3 = root.plotAmplitude(amp);
+                % Finds deletions from the findDeletion method in
+                % signalanalysis.
+                mm.findDeletion(percent, amp, handles.root3Period);
+                % Sets the edit boxes to display to result values.
+                set(handles.root3_count_edit, 'String', handles.root3Count);
+                set(handles.root3_avg_dur_edit, 'String', handles.root3Duration);
+                set(handles.root3_avg_per_edit, 'String', handles.root3Period);
+                set(handles.root3_avg_amp_edit, 'String', handles.root3Amp);
+                % Creates or refreshes the *Onset and *Offset fields in the
+                % handles structure of the GUI.
+                [handles.rootOnset3, handles.rootOffset3] = mm.returnBurstInfo;
 
         end
         % Updates the GUI handles structure.
@@ -144,8 +173,6 @@ if (button == 1)
          waitfor (msg);
          engRootErase(hObject, handles, mm, ax, baseline, identity, percent);
     end
-
-
-
+    
 end
 

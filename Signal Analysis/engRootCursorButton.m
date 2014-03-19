@@ -13,7 +13,8 @@ if (button == 1)
     % Switch block to determine which cursor button it was called from. 
     % Case 0 ---> cell.
     % Case 1 ---> root 1.
-    % Case 3 ---> root 2.
+    % Case 2 ---> root 2.
+    % Case 3 ---> root 3.
     switch identity
         
         % Case 0 for cell.
@@ -202,7 +203,77 @@ if (button == 1)
             guidata(hObject, handles);
             % Recursive if button == 1.
             cursor_root2_button_Callback(hObject, eventdata, handles);
+            
+        % Case 3 for root 3 data.
+        case 3
+            % -------------------------------------------------------------
+            % Obtains the information needed to create the root 3 object 
+            % and operations to detect bursts.
+            %--------------------------------------------------------------
+            % Root 3 data on axes5 of the GUI.
+            ax = handles.axes5;
+            % Baseline for root 3 must exist before the program can
+            % continue, otherwise an error dialouge box pops up to warn
+            % user to select a baseline first.
+            if (~isfield(handles, 'baseline3'))
+                errordlg('Please select a baseline for Root 3.');
+                return;
+            else
+                baseline = handles.baseline3;
+            end
+            % Gets the time, potential, threshold and the span, factor,
+            % spike, trough, burst, percent settings.
+            time        = getappdata(0, 'time');
+            potential   = getappdata(0, 'root3');
+            span        = getappdata(0, 'span');
+            factor      = getappdata(0, 'factor');
+            spike       = getappdata(0, 'spike3');
+            trough      = getappdata(0, 'trough3');
+            burst       = getappdata(0, 'burst3');
+            percent     = getappdata(0, 'percent3');
+            set(handles.thresh_root3_edit, 'String', y);
+            handles.threshold3 = str2double(get(handles.thresh_root3_edit, 'String'));
+            % Creates the root 3 object.
+            ro = root(time, potential, handles.threshold3);
+            % Makes axes5 the current axes.
+            axes(ax);
+            % Clears the current axes by finding all object on the plot
+            % with the following prooperties and deletes them.
+            del_items = findobj(ax, 'Color', 'red', '-or', 'Color', 'blue',...
+                '-or', 'Color', 'green', '-or', 'Color', 'm', '-or', 'Marker', '>', '-or',...
+                'Marker', '<', '-or', 'Marker', '+', '-or', 'Marker', 's');
+            delete(del_items);
+            % Operations that locates the bursts.
+            ro.bandpass(handles.filtOrder, handles.sampFrequency, handles.passFrequency);
+            ro.downsample(factor);
+            ro.filterData(span);
+            ro.aboveThreshold;
+            ro.isBurst(spike, trough, burst);
+            [handles.root3Duration, handles.root3Count] = ro.averageDuration;
+            handles.root3Period = ro.averagePeriod;
+            amp = ro.averageAmplitude(baseline);
+            handles.root3Amp = amp - baseline;
+            ro.plotMarkers;
+            handles.line3 = root.plotAmplitude(amp);
+            ro.findDeletion(percent, amp, handles.root3Period);
+            % Sets the values of the root 3 output edit boxes to the results
+            % obtained by the operations above.
+            set(handles.root3_count_edit, 'String', handles.root3Count);
+            set(handles.root3_avg_dur_edit, 'String', handles.root3Duration);
+            set(handles.root3_avg_per_edit, 'String', handles.root3Period);
+            set(handles.root3_avg_amp_edit, 'String', handles.root3Amp);
+            % Gets the *Onset and *Offset arrays used to calculate the time
+            % difference between two sets of data and polar plots. Stores
+            % these arrays onto fields on the GUI handles structure.
+            [rootOnset3, rootOffset3] = ro.returnBurstInfo;
+            handles.rootOnset3 = rootOnset3';
+            handles.rootOffset3 = rootOffset3';
+            % Updates the handles structure.
+            guidata(hObject, handles);
+            % Recursive if button == 1.
+            cursor_root3_button_Callback(hObject, eventdata, handles);
     end
+    
 end
 
 set(handles.instructions_edit, 'String', '');

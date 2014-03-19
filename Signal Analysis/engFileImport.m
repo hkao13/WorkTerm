@@ -22,7 +22,7 @@ function varargout = engFileImport(varargin)
 
 % Edit the above text to modify the response to help engFileImport
 
-% Last Modified by GUIDE v2.5 11-Mar-2014 15:10:43
+% Last Modified by GUIDE v2.5 19-Mar-2014 09:02:17
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -122,6 +122,7 @@ end
 function import_button_Callback(hObject, eventdata, handles)
     root1_col = str2double(get(handles.root1_edit, 'String'));
     root2_col = str2double(get(handles.root2_edit, 'String'));
+    root3_col = str2double(get(handles.root3_edit, 'String'));
     cell_col = str2double(get(handles.cell_edit, 'String'));
     first = str2double(get(handles.from_edit, 'String'));
     last = str2double(get(handles.to_edit, 'String'));
@@ -151,6 +152,12 @@ function import_button_Callback(hObject, eventdata, handles)
             root2 = data(:,root2_col);
         end
 
+        if (isnan(root3_col))
+            root3 = NaN;
+        else
+            root3 = data(:,root3_col);
+        end
+        
         if (isnan(cell_col))
             cell = NaN;
         else
@@ -165,6 +172,8 @@ function import_button_Callback(hObject, eventdata, handles)
             time = (0 : (1/sample) : (numel(root1) - 1)/sample)';
         elseif (~isnan(root2))
             time = (0 : (1/sample) : (numel(root2) - 1)/sample)';
+        elseif (~isnan(root3))
+            time = (0 : (1/sample) : (numel(root3) - 1)/sample)';
         else
             disp('No data sets were recognized, please try again.')
         end
@@ -173,6 +182,7 @@ function import_button_Callback(hObject, eventdata, handles)
         setappdata(0, 'span', span);
         setappdata(0, 'root1', root1);
         setappdata(0, 'root2', root2);
+        setappdata(0, 'root3', root3);
         setappdata(0, 'cell', cell);
         setappdata(0, 'time', time);
         set(handles.import_edit, 'String', 'Import Successful');
@@ -225,7 +235,15 @@ function root2_edit_CreateFcn(hObject, eventdata, handles)
     end
 end
 
+function root3_edit_Callback(hObject, eventdata, handles)
+end
 
+% --- Executes during object creation, after setting all properties.
+function root3_edit_CreateFcn(hObject, eventdata, handles)
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+end
 
 function span_edit_Callback(hObject, eventdata, handles)
 end
@@ -253,15 +271,9 @@ end
 
 % --------------------------------------------------------------------
 function tools_menu_Callback(hObject, eventdata, handles)
-% hObject    handle to tools_menu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 end
 
 % --------------------------------------------------------------------
 function filter_menu_Callback(hObject, eventdata, handles)
-% hObject    handle to filter_menu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-filterSettings;
+    filterSettings;
 end

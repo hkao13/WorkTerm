@@ -4,7 +4,8 @@ set(handles.instructions_edit, 'String', message);
 % Switch block to determine which cursor button it was called from. 
 % Case 0 ---> cell.
 % Case 1 ---> root 1.
-% Case 3 ---> root 2.
+% Case 2 ---> root 2.
+% Case 3 ---> root 3.
 switch identity
     
     % Case 0 for cell.
@@ -86,7 +87,7 @@ switch identity
         time        = getappdata(0, 'time');
         potential   = getappdata(0, 'root2');
         threshold = str2double(get(handles.thresh_root2_edit, 'String'));
-        % Try-catch block determines if rootOnset1 and rootOffset1 already
+        % Try-catch block determines if rootOnset2 and rootOffset2 already
         % exist within the GUI handle structure. If they do, manual mode
         % builds onto the prexisting set of bursts, otherwise, manual mode
         % starts with no prexisting bursts.
@@ -97,6 +98,37 @@ switch identity
             mm = root(time, potential, threshold);
         end
         
+    % Case 3 for root 3 data.
+    case 3
+        % -------------------------------------------------------------
+        % Obtains the information needed to create the root 3 object 
+        % and operations to detect bursts.
+        %--------------------------------------------------------------
+        % Root 3 data on axes5 of the GUI.
+        ax = handles.axes5;
+        % Baseline for root 3 must exist before the program can
+        % continue, otherwise an error dialouge box pops up to warn
+        % user to select a baseline first.
+        if (~isfield(handles, 'baseline3'))
+           errordlg('Please select a baseline for Root 3.');
+           return;
+        else
+            baseline = handles.baseline3;
+        end
+        % Gets the time, potential, threshold.
+        time        = getappdata(0, 'time');
+        potential   = getappdata(0, 'root3');
+        threshold = str2double(get(handles.thresh_root3_edit, 'String'));
+        % Try-catch block determines if rootOnset3 and rootOffset3 already
+        % exist within the GUI handle structure. If they do, manual mode
+        % builds onto the prexisting set of bursts, otherwise, manual mode
+        % starts with no prexisting bursts.
+        try
+            mm = root(time, potential, threshold,...
+                handles.rootOnset3, handles.rootOffset3);
+        catch err 
+            mm = root(time, potential, threshold);
+        end
 end
 
 % evenHandle is used as a place holder for 'v' button press that plots

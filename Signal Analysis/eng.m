@@ -29,7 +29,7 @@ function varargout = eng(varargin)
 
 % Edit the above text to modify the response to help eng
 
-% Last Modified by GUIDE v2.5 18-Mar-2014 12:52:18
+% Last Modified by GUIDE v2.5 18-Mar-2014 15:44:46
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -188,16 +188,20 @@ function figure_polar_menu_Callback(hObject, eventdata, handles)
         switch plot1
             
             case 1
-                firstPlotOnset = handles.cellOnset;
-                firstPlotOffset = handles.cellOffset;
+                firstPlotOnset = handles.cellOnset(:);
+                firstPlotOffset = handles.cellOffset(:);
                 
             case 2
-                firstPlotOnset = handles.rootOnset1;
-                firstPlotOffset = handles.rootOffset1;
+                firstPlotOnset = handles.rootOnset1(:);
+                firstPlotOffset = handles.rootOffset1(:);
                 
             case 3
-                firstPlotOnset = handles.rootOnset2;
-                firstPlotOffset = handles.rootOffset2;
+                firstPlotOnset = handles.rootOnset2(:);
+                firstPlotOffset = handles.rootOffset2(:);
+                
+            case 4
+                firstPlotOnset = handles.rootOnset3(:);
+                firstPlotOffset = handles.rootOffset3(:);
                 
             otherwise
                 fprinf('\nInvalid plot, Please choose again.\n')
@@ -208,16 +212,20 @@ function figure_polar_menu_Callback(hObject, eventdata, handles)
         switch plot2
             
             case 1
-                secondPlotOnset = handles.cellOnset;
-                secondPlotOffset = handles.cellOffset;
+                secondPlotOnset = handles.cellOnset(:);
+                secondPlotOffset = handles.cellOffset(:);
                 
             case 2
-                secondPlotOnset = handles.rootOnset1;
-                secondPlotOffset = handles.rootOffset1;
+                secondPlotOnset = handles.rootOnset1(:);
+                secondPlotOffset = handles.rootOffset1(:);
                 
             case 3
-                secondPlotOnset = handles.rootOnset2;
-                secondPlotOffset = handles.rootOffset2;
+                secondPlotOnset = handles.rootOnset2(:);
+                secondPlotOffset = handles.rootOffset2(:);
+                
+            case 4
+                secondPlotOnset = handles.rootOnset3(:);
+                secondPlotOffset = handles.rootOffset3(:);
                 
             otherwise
                 fprinf('\nInvalid plot, Please choose again.\n')
@@ -267,7 +275,7 @@ function figure_polar_menu_Callback(hObject, eventdata, handles)
         % radius.
         timeOnsetDiffArray(end) = [];
         theta = (-2*pi*(timeOnsetDiffArray./referencePeriod)) + (pi/2);
-        radius = ones(1, numel(theta));
+        radius = ones(size(theta));
         yBar = mean(sin(theta));
         xBar = mean(cos(theta));
         radiusBar = [0, sqrt((xBar^2) + (yBar^2))];
@@ -364,6 +372,10 @@ function [timeOnsetDiff, timeOffsetDiff] = set_time_diff (handles)
                 firstPlotOnset = handles.rootOnset2(:);
                 firstPlotOffset = handles.rootOffset2(:);
                 
+            case 4
+                firstPlotOnset = handles.rootOnset3(:);
+                firstPlotOffset = handles.rootOffset3(:);
+                
             otherwise
                 fprinf('\nInvalid plot, Please choose again.\n')
                 
@@ -374,12 +386,19 @@ function [timeOnsetDiff, timeOffsetDiff] = set_time_diff (handles)
             case 1
                 secondPlotOnset = handles.cellOnset(:);
                 secondPlotOffset = handles.cellOffset(:);
+                
             case 2
                 secondPlotOnset = handles.rootOnset1(:);
                 secondPlotOffset = handles.rootOffset1(:);
+                
             case 3
                 secondPlotOnset = handles.rootOnset2(:);
                 secondPlotOffset = handles.rootOffset2(:);
+                
+            case 4
+                secondPlotOnset = handles.rootOnset3(:);
+                secondPlotOffset = handles.rootOffset3(:);
+                
             otherwise
                 fprinf('\nInvalid plot, Please choose again.\n')
         end
@@ -894,6 +913,147 @@ function root2_avg_amp_edit_CreateFcn(hObject, eventdata, handles)
     end
 end
 
+%--------------------------------------------------------------------------
+% ROOT 3 INPUT PANEL BUTTONS
+% -------------------------------------------------------------------------
+% --- Executes on button press in set_root3_button.
+function set_root3_button_Callback(hObject, eventdata, handles)
+    identity = 3;
+    engRootSetButton;
+end
+
+% --- Executes on button press in cursor_root3_button.
+function cursor_root3_button_Callback(hObject, eventdata, handles)
+    identity = 3;
+    engRootCursorButton;
+end
+
+% --- Executes on button press in manual_root3_button.
+function manual_root3_button_Callback(hObject, eventdata, handles)
+    identity = 3;
+    engRootManualButton;
+end
+
+% --- Executes on button press in erase_root3_button.
+function erase_root3_button_Callback(hObject, eventdata, handles)
+    identity = 3;
+    engRootEraseButton;
+end
+
+% --- Executes on button press in baseline3_button.
+function baseline3_button_Callback(hObject, eventdata, handles)
+    % Brings up cursor.
+    [x, y, button] = ginput(1);
+    % Executes following code if Left Mouse Click
+    if (button == 1)
+        try
+            % Deletes previous baseline graphics object from axes.
+            delete(handles.base3)
+        catch err
+        end
+        % Sets the baseline edit box for root 3 to the y-value obtained
+        % through ginput.
+        set(handles.baseline3_edit, 'String', y);
+        % Updates the baseline2 field in handles to the new y-value from
+        % ginput.
+        handles.baseline3 = str2double(get(handles.baseline3_edit, 'String'));
+        hold on;
+        % Updates the base3 field graphics object.
+        handles.base3 = refline(0, handles.baseline3);
+        % Sets base2 color to red
+        set(handles.base3, 'Color', 'r');
+        hold off;
+        
+        % Updates the GUI handles structure.
+        guidata(hObject, handles);
+        
+    end
+    
+end
+
+% --- Executes on button press in root3_reset_button.
+function root3_reset_button_Callback(hObject, eventdata, handles)
+    identity = 3;
+    engResetButtons;
+end
+
+% --- Executes on button press in view_baseline3.
+function view_baseline3_Callback(hObject, eventdata, handles)
+    axes(handles.axes5);
+    % Re-plots base1 field graphics object to the current axes.
+    handles.base3 = refline(0, handles.baseline3);
+    set(handles.base3, 'Color', 'r');
+end
+
+% -------------------------------------------------------------------------
+% ROOT 3 INPUT PANEL EDIT BOXES
+% -------------------------------------------------------------------------
+function thresh_root3_edit_Callback(hObject, eventdata, handles)
+end
+
+% --- Executes during object creation, after setting all properties.
+function thresh_root3_edit_CreateFcn(hObject, eventdata, handles)
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+end
+
+function baseline3_edit_Callback(hObject, eventdata, handles)
+end
+
+% --- Executes during object creation, after setting all properties.
+function baseline3_edit_CreateFcn(hObject, eventdata, handles)
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+end
+
+% -------------------------------------------------------------------------
+% ROOT 3 OUTPUT PANEL EDIT BOXES
+% -------------------------------------------------------------------------
+function root3_avg_dur_edit_Callback(hObject, eventdata, handles)
+end
+
+% --- Executes during object creation, after setting all properties.
+function root3_avg_dur_edit_CreateFcn(hObject, eventdata, handles)
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+end
+
+
+function root3_avg_per_edit_Callback(hObject, eventdata, handles)
+end
+
+% --- Executes during object creation, after setting all properties.
+function root3_avg_per_edit_CreateFcn(hObject, eventdata, handles)
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+end
+
+
+function root3_avg_amp_edit_Callback(hObject, eventdata, handles)
+end
+
+% --- Executes during object creation, after setting all properties.
+function root3_avg_amp_edit_CreateFcn(hObject, eventdata, handles)
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+end
+
+
+function root3_count_edit_Callback(hObject, eventdata, handles)
+end
+
+% --- Executes during object creation, after setting all properties.
+function root3_count_edit_CreateFcn(hObject, eventdata, handles)
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+end
+
 % -------------------------------------------------------------------------
 % SETTINGS BUTTON
 % -------------------------------------------------------------------------
@@ -915,8 +1075,13 @@ function settings2_GUI_button_Callback(hObject, eventdata, handles)
     engSettings2;
 end
 
+% --- Executes on button press in settings3_GUI_button.
+function settings3_GUI_button_Callback(hObject, eventdata, handles)
+    engSettings3;
+end
 
-
+% -------------------------------------------------------------------------
+% Instructions edit box.
 function instructions_edit_Callback(hObject, eventdata, handles)
 end
 
@@ -927,3 +1092,4 @@ function instructions_edit_CreateFcn(hObject, eventdata, handles)
         set(hObject,'BackgroundColor','white');
     end
 end
+% -------------------------------------------------------------------------

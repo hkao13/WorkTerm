@@ -22,6 +22,9 @@ handles.root1           = getappdata(0, 'root1');
 % Electric potentials for root 2
 handles.root2           = getappdata(0, 'root2');
 
+% Electric potentials for root 3.
+handles.root3           = getappdata(0, 'root3');
+
 % Moving average span setting for both root data sets.
 handles.span            = getappdata(0, 'span');
 
@@ -70,6 +73,18 @@ handles.burst2          = getappdata(0, 'burst2');
 % Deletion percentage setting for the root 2 data set.
 handles.percent2        = getappdata(0, 'percent2');
 
+% Spike threshold setting for the root 3 data set.
+handles.spike3          = getappdata(0, 'spike3');
+
+% Trough threshold setting for the root 3 data set.
+handles.trough3         = getappdata(0, 'trough3');
+
+% Burst threshold setting for the root 3 data set.
+handles.burst3          = getappdata(0, 'burst3');
+
+% Deletion percentage setting for the root 3 data set.
+handles.percent3        = getappdata(0, 'percent3');
+
 % -------------------------------------------------------------------------
 % Resets all edit boxes to blank.
 % -------------------------------------------------------------------------
@@ -87,6 +102,12 @@ set(handles.root2_avg_per_edit, 'String', '');
 set(handles.root2_avg_amp_edit, 'String', '');
 set(handles.root1_count_edit,   'String', '');
 set(handles.root2_count_edit,   'String', '');
+set(handles.baseline3_edit,     'String', '');
+set(handles.thresh_root3_edit,  'String', '');
+set(handles.root3_count_edit,   'String', '');
+set(handles.root3_avg_dur_edit, 'String', '');
+set(handles.root3_avg_per_edit, 'String', '');
+set(handles.root3_avg_amp_edit, 'String', '');
 set(handles.thresh_cell_edit,   'String', '');
 set(handles.cell_count_edit,    'String', '');
 set(handles.cell_avg_per_edit,  'String', '');
@@ -98,6 +119,7 @@ set(handles.instructions_edit,  'String', '');
 % Getting parameters for initializing the signal analysis objects.
 threshold1 = str2double(get(handles.thresh_root1_edit, 'String'));
 threshold2 = str2double(get(handles.thresh_root2_edit, 'String'));
+threshold3 = str2double(get(handles.thresh_root3_edit, 'String'));
 span = getappdata(0, 'span');
 factor = getappdata(0, 'factor');
 
@@ -109,7 +131,8 @@ disp('Plotting Data...')
 warning OFF;
 ax(1) = handles.axes2; % cell data on axes 2.
 ax(2) = handles.axes3; % root 1 data on axes 3.
-ax(4) = handles.axes4; % root 2 dsta on axes 4.
+ax(4) = handles.axes4; % root 2 data on axes 4.
+ax(5) = handles.axes5; % root 3 data on axes 5.
 linkaxes(ax, 'x');
 
 % Creates the cell data object and plots the cell data if exists.
@@ -142,6 +165,17 @@ if(~isnan(handles.root2))
     ro2.plotData
 end
 
+% Creates root 3 data object and plots root 2 data if exists.
+axes(handles.axes5);
+cla;
+if(~isnan(handles.root3))
+    ro3 = root(handles.time, handles.root3, threshold3);
+    ro3.bandpass(handles.filtOrder, handles.sampFrequency, handles.passFrequency);
+    ro3.downsample(factor);
+    ro3.filterData(span);
+    ro3.plotData
+end
+
 % Finished plotting the data.
 disp('Plotting Finished')
 
@@ -172,6 +206,14 @@ end
 try
     handles = rmfield(handles, 'rootOnset2');
     handles = rmfield(handles, 'rootOffset2');
+    guidata(hObject, handles);
+catch err
+    
+end
+
+try
+    handles = rmfield(handles, 'rootOnset3');
+    handles = rmfield(handles, 'rootOffset3');
     guidata(hObject, handles);
 catch err
     

@@ -1,7 +1,8 @@
 % Switch block to determine which cursor button it was called from. 
 % Case 0 ---> cell.
 % Case 1 ---> root 1.
-% Case 3 ---> root 2.
+% Case 2 ---> root 2.
+% Case 3 ---> root 3.
 switch identity
     
     %Case 0 for cell.
@@ -81,7 +82,7 @@ switch identity
         % Updates GUI handles structure.
         guidata(hObject, handles);
         
-    % CAse 1 for root 1.    
+    % Case 1 for root 1.    
     case 1
         % -----------------------------------------------------------------
         % Resets only the values obtained through the root 1 panels to the
@@ -263,6 +264,98 @@ switch identity
         
         % Updates the GUI handles structure.
         guidata(hObject, handles);
+        
+    % Case 3 for root 3.
+    case 3
+        % -----------------------------------------------------------------
+        % Resets only the values obtained through the root 3 panels to the
+        % state when plot button was pressed. Cell and root 1 will remain
+        % unchanged.
+        % -----------------------------------------------------------------
+        disp('Reseting Root 3 Data...');
+       
+        % Removes the threshold3 field (threshold for the root 3 data) if
+        % it exists in the handles structure.
+        if(isfield(handles, 'threshold3'))
+            handles = rmfield(handles, 'threshold3');
+        end
+        
+        % Removes the baseline3 field (values for the baseline for root 3)
+        % if exists from the handles structure.
+        if(isfield(handles, 'baseline3'))
+            handles = rmfield(handles, 'baseline3');
+        end
+        
+        % Removes the base3 field (graphics object for baseline3) if exists
+        % from the handles structure.
+        if(isfield(handles, 'base3'))
+            handles = rmfield(handles, 'base3');
+        end
+        
+        % Removes the line3 field (graphics object for root 3 amplitude) if
+        % exists from the handles structure.
+        if(isfield(handles, 'line3'))
+            handles = rmfield(handles, 'line3');
+        end
+        
+        % Removes the rootOnset3 field (values of all onsets in the root
+        % 3 data set) if exists in the handles structure.
+        if(isfield(handles, 'rootOnset3'))
+            handles = rmfield(handles, 'rootOnset3');
+        end
+        
+        % Removes the rootOffset3 field (values of all offsets in the root
+        % 3 data set) if exists in the handles structure.
+        if(isfield(handles, 'rootOffset3'))
+            handles = rmfield(handles, 'rootOffset3');
+        end
+        
+        % Removes the root3Duration field (value for the average duration
+        % of a root 3 burst) if exists from the handles structure.
+        if(isfield(handles, 'root3Duration'))
+            handles = rmfield(handles, 'root3Duration');
+        end
+        
+        % Removes the root2Count field (value for number of root 3 bursts)
+        % if exists from the handles structure.
+        if(isfield(handles, 'root3Count'))
+            handles = rmfield(handles, 'root3Count');
+        end
+        
+        % Removes the root2Period field (value for average period between
+        % root 3 bursts) if exists from the handles structure.
+        if(isfield(handles, 'root3Period'))
+            handles = rmfield(handles, 'root3Period');
+        end
+        
+        % Removes the root3Amp field (values for the average amplitude of
+        % root 3 data) if exists from the handles structure.
+        if(isfield(handles, 'root3Amp'))
+            handles = rmfield(handles, 'root3Amp');
+        end
+        
+        % Resets the values of the edit boxes in the root 3 input and
+        % output panels to nothing.
+        set(handles.thresh_root3_edit, 'String', '');
+        set(handles.baseline3_edit, 'String', '');
+        set(handles.root3_count_edit, 'String', '');
+        set(handles.root3_avg_dur_edit, 'String', '');
+        set(handles.root3_avg_per_edit, 'String', '');
+        set(handles.root3_avg_amp_edit, 'String', '');
+        set(handles.root3_count_edit, 'String', '');
+        threshold3 = str2double(get(handles.thresh_root3_edit, 'String'));
+        
+        % Removes all graphics onjects from the root 3 plot except that of
+        % the root 3 data.
+        axes(handles.axes5);
+        del_items = findobj(handles.axes5, 'Color', 'red', '-or', 'Color', 'blue',...
+            '-or', 'Color', 'green', '-or', 'Color', 'm', '-or', 'Marker', '>', '-or',...
+            'Marker', '<', '-or', 'Marker', '+', '-or', 'Marker', 's');
+        delete(del_items);
+        
+        % Updates the GUI handles structure.
+        guidata(hObject, handles);
+        
 end
 
 
@@ -271,4 +364,5 @@ warning OFF;
 ax(1) = handles.axes2;
 ax(2) = handles.axes3;
 ax(4) = handles.axes4;
+ax(5) = handles.axes5;
 linkaxes(ax, 'x');

@@ -14,6 +14,7 @@ function engRootManualMode( hObject, handles, identity, mm, baseline,...
 %                                     Cell   ---> 0
 %                                     Root 1 ---> 1
 %                                     Root 2 ---> 2
+%                                     Root 3 ---> 3
 % mm                object          Object of the cel or root sub-classes
 %                                     of signalanalysis.
 % baseline          double          Baseline of the root plots.
@@ -218,6 +219,47 @@ function engRootManualMode( hObject, handles, identity, mm, baseline,...
                     hold off
                 end
                 
+            case 3
+                % Try-catch block trys to find line3 (average amplitude
+                % graphic object for root 3) in the handles structure, if
+                % exists, removes line2 object from axes, otherwise does
+                % nothing.
+                try
+                    delete(handles.line3);
+                catch err
+                end
+                % Gets burst duration and burst count from averageDuration
+                % method in signalanalysis.
+                [handles.root3Duration, handles.root3Count] = mm.averageDuration;
+                % Gets amp value that is referenced from 0 from
+                % averageAmplitude method in signalanalysis.
+                amp = mm.averageAmplitude(baseline);
+                % Gets burst period from averagePeriod method in
+                % signalanalysis
+                handles.root3Period = mm.averagePeriod;
+                % True amplitude is amp subtract baseline
+                handles.root3Amp = amp - baseline;
+                % Refreshes the amplitude graphics object in handles.
+                handles.line3 = mm.plotAmplitude(amp);
+                % Sets the edit boxes to display to result values. 
+                set(handles.root3_count_edit, 'String', handles.root3Count);
+                set(handles.root3_avg_dur_edit, 'String', handles.root3Duration);
+                set(handles.root3_avg_per_edit, 'String', handles.root3Period);
+                set(handles.root3_avg_amp_edit, 'String', handles.root3Amp);
+                [rootOnset3, rootOffset3] = mm.returnBurstInfo;
+                % Creates or refreshes the *Onset and *Offset fields in the
+                % handles structure of the GUI.
+                handles.rootOnset3 = rootOnset3;
+                handles.rootOffset3 = rootOffset3;
+                
+                threshold = str2double(get(handles.thresh_root3_edit, 'String'));
+                if(isnan(threshold))
+                    set(handles.thresh_root3_edit, 'String', mean(yValues));
+                    hold on
+                    refline(0, mean(yValues));
+                    hold off
+                end
+               
         end
         
         % Updates GUI handles structure.

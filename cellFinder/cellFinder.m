@@ -245,7 +245,7 @@ end
 
 % --- Executes on button press in import_button.
 function import_button_Callback(hObject, eventdata, handles)
-    [filename, pathname] = uigetfile('*.png');
+    [filename, pathname] = uigetfile({'*.png'; '*.jpg'});
     full = fullfile(pathname, filename);
     handles.img = imread(full);
     handles.fig = handles.img;

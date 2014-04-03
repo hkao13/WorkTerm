@@ -198,7 +198,7 @@ function centroidsSave_menu_Callback(hObject, eventdata, handles)
         for i = 1:numel(handles.redStats)
             centroid = handles.redStats(i).Centroid;
             xRed(i) = centroid(1) - xo;
-            yRed(i) = centroid(2) - yo;
+            yRed(i) = centroid(1) - yo;
         end
         cRed(:) = 1;
         data = vertcat(data, [xRed, yRed, cRed]);
@@ -211,7 +211,7 @@ function centroidsSave_menu_Callback(hObject, eventdata, handles)
         for i = 1:numel(handles.greenStats)
             centroid = handles.greenStats(i).Centroid;
             xGreen(i) = centroid(1) - xo;
-            yGreen(i) = centroid(2) - yo;
+            yGreen(i) = centroid(1) - yo;
         end
         cGreen(:) = 2;
         data = vertcat(data, [xGreen, yGreen, cGreen]);
@@ -260,7 +260,7 @@ function centroidsSave_menu_Callback(hObject, eventdata, handles)
         xGreenRed = zeros(numel(handles.greenRedStats), 1);
         yGreenRed = zeros(numel(handles.greenRedStats), 1);
         cGreenRed = zeros(numel(handles.greenRedStats), 1);
-        for i = 1:numel(handles.greenRedStats)
+        for i = numel(handles.greenRedStats)
             centroid = handles.greenRedStats(i).Centroid;
             xGreenRed(i) = centroid(1) - xo;
             yGreenRed(i) = centroid(2) - yo;
@@ -273,14 +273,7 @@ function centroidsSave_menu_Callback(hObject, eventdata, handles)
         xBlueGreenRed = zeros(numel(handles.blueGreenRedStats), 1);
         yBlueGreenRed = zeros(numel(handles.blueGreenRedStats), 1);
         cBlueGreenRed = zeros(numel(handles.blueGreenRedStats), 1);
-        for i = numel(handles.blueGreenRedStats)
-            centroid = handles.blueGreenRedStats(i).Centroid;
-            xBlueGreenRed(i) = centroid(1) - xo;
-            yBlueGreenRed(i) = centroid(2) - yo;
-        end
-        cBlueGreenRed(:) = 123;
-        data = vertcat(data, [xBlueGreenRed, yBlueGreenRed, cBlueGreenRed]);
-    end
+        
     
     [filename, pathname] = uiputfile({'*.txt'});
     full = fullfile(pathname, filename);

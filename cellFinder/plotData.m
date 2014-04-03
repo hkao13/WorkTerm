@@ -36,7 +36,7 @@ end
 hold off
 
 
-n = 10;
+n = 5;
 xxi = linspace(min(xx(:)), max(xx(:)), n);
 yyi = linspace(min(yy(:)), max(yy(:)), n);
 

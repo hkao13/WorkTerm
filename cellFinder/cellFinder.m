@@ -191,7 +191,7 @@ function centroidsSave_menu_Callback(hObject, eventdata, handles)
     
     data = [];
     
-    if(isfield(handles, 'blueStats'))
+    if(isfield(handles, 'redStats'))
         xRed = zeros(numel(handles.redStats), 1);
         yRed = zeros(numel(handles.redStats), 1);
         cRed = zeros(numel(handles.redStats), 1);
@@ -564,7 +564,7 @@ function import_button_Callback(hObject, eventdata, handles)
         handles = rmfield(handles, 'imgEdit');
     end
 
-    [filename, pathname] = uigetfile({'*.tiff'; '*.png'; '*.jpg'; '*.jpeg'});
+    [filename, pathname] = uigetfile({'*.tiff'; '*.tif'; '*.png'; '*.jpg'; '*.jpeg'});
     full = fullfile(pathname, filename);
     handles.img = imread(full);
     handles.fig = handles.img;
@@ -572,7 +572,7 @@ function import_button_Callback(hObject, eventdata, handles)
     axis xy;
     dot = regexp(filename, '\.');
     switch(filename(dot+1:end))
-        case {'tiff'}
+        case {'tiff', 'tif'}
             try
                 handles.img(:,:,4) = []; % Removes 4th channel from .tiff
             catch err

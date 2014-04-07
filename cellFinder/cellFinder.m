@@ -22,7 +22,7 @@ function varargout = cellFinder(varargin)
 
 % Edit the above text to modify the response to help cellFinder
 
-% Last Modified by GUIDE v2.5 02-Apr-2014 14:44:26
+% Last Modified by GUIDE v2.5 07-Apr-2014 12:10:40
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -155,32 +155,6 @@ end
 
 % --------------------------------------------------------------------
 function centroidsSave_menu_Callback(hObject, eventdata, handles)
-%     answer = inputdlg({'Type "r" for RED, "g" for GREEN, "b" for BLUE'});
-%     switch answer{1}
-%         case {'r'}
-%             color = 1;
-%         case {'g'}
-%             color = 2;
-%         case {'b'}
-%             color = 3;
-%     end
-%     if(isfield(handles, 'stats'))
-%         xxArray = cell(numel(handles.stats), 1);
-%         yyArray = cell(numel(handles.stats), 1);
-%         markColor = cell(numel(handles.stats), 1); 
-%         for i = 1:numel(handles.stats);
-%             centroid = handles.stats(i);
-%             coord = centroid.Centroid;
-%             xxArray{i} = coord(1) - handles.origin(1);
-%             yyArray{i} = coord(2) - handles.origin(2);
-%             markColor{i} = color;     
-%         end
-%         [filename, pathname] = uiputfile({'*.txt'});
-%         full = fullfile(pathname, filename);
-%         dlmwrite(full, cell2mat([xxArray, yyArray, markColor]), 'delimiter', '\t');
-%     else
-%         errordlg('No centroid data to save.');
-%     end
     if(isfield(handles, 'origin'))
         xo = handles.origin(1);
         yo = handles.origin(2);
@@ -354,11 +328,64 @@ function section_menu_Callback(hObject, eventdata, handles)
         grid(:, round(xValues(j)), :) = 0;
     end
     
+    imageSize = size(handles.img);
     handles.imgGrid = imcomplement(grid);
-    handles.gridRows = sort(yValues, 'ascend');
-    handles.gridCols = sort(xValues, 'ascend');
+    handles.gridRows = [0, sort(yValues, 'ascend'), imageSize(1)];
+    handles.gridCols = [0, sort(xValues, 'ascend'), imageSize(2)];
     guidata(hObject, handles);
 end 
+
+
+% --------------------------------------------------------------------
+function choose_menu_Callback(hObject, eventdata, handles)
+    if(isfield(handles, 'gridRows') && isfield(handles, 'gridCols'))
+        gridRows = handles.gridRows;
+        gridCols = handles.gridCols;
+    else
+        msgbox('No Sections to choose from. Please section image first');
+        return;
+    end
+    
+    topMsg = msgbox('Please click on the most top left section of the grid you want to use.');
+    waitfor(topMsg);
+    [xTop, yTop, buttonTop] = ginput(1);
+     if (buttonTop == 1)
+         keepTopRows = (yTop < gridRows);
+         keepTopRows(find(keepTopRows, 1, 'first') - 1) = 1;
+         gridRows = gridRows(keepTopRows == 1);
+         keepTopCols = (xTop < gridCols);
+         keepTopCols(find(keepTopCols, 1, 'first') - 1) = 1;
+         gridCols = gridCols(keepTopCols == 1);
+     else
+         return
+     end
+    
+    botMsg = msgbox('Please click on the most bottom right section of the grid you want to use.');
+    waitfor(botMsg);
+    [xBot, yBot, buttonBot] = ginput(1);
+    if (buttonBot == 1)
+        keepBotRows = (yBot > gridRows);
+        keepBotRows(find(keepBotRows, 1, 'last') + 1) = 1;
+        gridRows = gridRows(keepBotRows == 1);
+        keepBotCols = (xBot > gridCols);
+        keepBotCols(find(keepBotCols, 1, 'last') + 1) = 1;
+        gridCols = gridCols(keepBotCols == 1);
+    else
+        return
+    end
+    confirm = questdlg('Press OK to confirm secletion, or press No/Cancel to try again');
+    waitfor(confirm);
+    switch confirm
+        case 'Yes'
+            handles.gridRows = gridRows;
+            handles.gridCols = gridCols;
+            guidata(hObject, handles);
+        case 'No'
+            choose_menu_Callback(hObject, eventdata, handles)
+        case 'Cancel'
+            choose_menu_Callback(hObject, eventdata, handles)
+    end
+end
 
 % --------------------------------------------------------------------
 function mode_menu_Callback(hObject, eventdata, handles)
@@ -405,6 +432,7 @@ function stuff_menu_Callback(hObject, eventdata, handles)
         blueGreen = imreconstruct(handles.imgBlue, handles.imgGreen);
         handles.imgBlueGreenRed = imreconstruct(blueGreen, handles.imgRed);
     end
+    handles.cleanAxes = getimage(handles.axes1);
     guidata(hObject, handles);
 end
 
@@ -564,7 +592,7 @@ function import_button_Callback(hObject, eventdata, handles)
         handles = rmfield(handles, 'imgEdit');
     end
 
-    [filename, pathname] = uigetfile({'*.tiff'; '*.tif'; '*.png'; '*.jpg'; '*.jpeg'});
+    [filename, pathname] = uigetfile({'*.tiff;*.tif'; '*.png'; '*.jpg'; '*.jpeg'});
     full = fullfile(pathname, filename);
     handles.img = imread(full);
     handles.fig = handles.img;
@@ -589,7 +617,15 @@ end
     
 % --- Executes on button press in gray_button.
 function gray_button_Callback(hObject, eventdata, handles)
-    handles.imgGray = rgb2gray(handles.img);
+    if (get(handles.red_radio, 'Value') == 1)
+        handles.imgGray = handles.img(:, :, 1);
+    elseif (get(handles.green_radio, 'Value') == 1)
+        handles.imgGray = handles.img(:, :, 2);
+    elseif (get(handles.blue_radio, 'Value') == 1)
+        handles.imgGray = handles.img(:, :, 3);
+    else
+        handles.imgGray = rgb2gray(handles.img);
+    end
     handles.fig = handles.imgGray;
     imshow(handles.imgGray);
     guidata(hObject, handles);
@@ -914,8 +950,8 @@ function count_button_Callback(hObject, eventdata, handles)
        
     if (isfield(handles, 'gridRows') || isfield(handles, 'gridCols'))
         imageSize = size(handles.img);
-        gridRows = [0, handles.gridRows, imageSize(1)];
-        gridCols = [0, handles.gridCols, imageSize(2)];
+        gridRows = handles.gridRows;
+        gridCols = handles.gridCols;
         height = diff(gridRows);
         width = diff(gridCols);
         sections = 1:(numel(width) * numel(height));
@@ -976,19 +1012,27 @@ function count_button_Callback(hObject, eventdata, handles)
             end     
         end
 
+        
+        if(get(handles.red_radio, 'Value') == 1)
+            handles.quadrantRed = block;
+            clc;
+            disp('Red Cells');
+        elseif(get(handles.green_radio, 'Value') == 1)
+            handles.quadrantGreen = block;
+            clc;
+            disp('Green Cells');
+        elseif(get(handles.blue_radio, 'Value') == 1)
+            handles.quadrantBlue = block;
+            clc;
+            disp('Blue Cells');
+        else
+            return
+        end
+        
         for i = 1:numel(block);
             fprintf('Block: %d\t-\tCell Count: %d\n', block(i).blockNumber, block(i).cellCount); 
         end
         fprintf('\n');
-        if(get(handles.red_radio, 'Value') == 1)
-            handles.quadrantRed = block;
-        elseif(get(handles.green_radio, 'Value') == 1)
-            handles.quadrantGreen = block;
-        elseif(get(handles.blue_radio, 'Value') == 1)
-            handles.quadrantBlue = block;
-        else
-            return
-        end              
     end
     
     if(get(handles.red_radio, 'Value') == 1)
@@ -1017,52 +1061,48 @@ end
 % --- Executes on button press in grid1_button.
 function grid1_button_Callback(hObject, eventdata, handles)
     currentFig = getimage(handles.axes1);
-    for i = 1:numel(handles.gridRows)
-        currentFig(round(handles.gridRows(i)), :, :) = 255;
-    end
-    
-    for j = 1:numel(handles.gridCols)
-        currentFig(:, round(handles.gridCols(j)), :) = 255;
-    end
+    gridRows = handles.gridRows;
+    gridRows(gridRows == 0) = 1;
+    currentFig(round(gridRows(:)), :, :) = 255;
+    gridCols = handles.gridCols;
+    gridCols(gridCols == 0) = 1;
+    currentFig(:, round(gridCols(:)), :) = 255;
     imshow(currentFig);
 end
 
 % --- Executes on button press in grid2_button.
 function grid2_button_Callback(hObject, eventdata, handles)
     currentFig = getimage(handles.axes1);
-    for i = 1:numel(handles.gridRows)
-        currentFig(round(handles.gridRows(i)), :, :) = 255;
-    end
-    
-    for j = 1:numel(handles.gridCols)
-        currentFig(:, round(handles.gridCols(j)), :) = 255;
-    end
+    gridRows = handles.gridRows;
+    gridRows(gridRows == 0) = 1;
+    currentFig(round(gridRows(:)), :, :) = 255;
+    gridCols = handles.gridCols;
+    gridCols(gridCols == 0) = 1;
+    currentFig(:, round(gridCols(:)), :) = 255;
     imshow(currentFig);
 end
 
 % --- Executes on button press in grid3_button.
 function grid3_button_Callback(hObject, eventdata, handles)
     currentFig = getimage(handles.axes1);
-    for i = 1:numel(handles.gridRows)
-        currentFig(round(handles.gridRows(i)), :, :) = 255;
-    end
-    
-    for j = 1:numel(handles.gridCols)
-        currentFig(:, round(handles.gridCols(j)), :) = 255;
-    end
+    gridRows = handles.gridRows;
+    gridRows(gridRows == 0) = 1;
+    currentFig(round(gridRows(:)), :, :) = 255;
+    gridCols = handles.gridCols;
+    gridCols(gridCols == 0) = 1;
+    currentFig(:, round(gridCols(:)), :) = 255;
     imshow(currentFig);
 end
 
 % --- Executes on button press in grid4_button.
 function grid4_button_Callback(hObject, eventdata, handles)
     currentFig = getimage(handles.axes1);
-    for i = 1:numel(handles.gridRows)
-        currentFig(round(handles.gridRows(i)), :, :) = 255;
-    end
-    
-    for j = 1:numel(handles.gridCols)
-        currentFig(:, round(handles.gridCols(j)), :) = 255;
-    end
+    gridRows = handles.gridRows;
+    gridRows(gridRows == 0) = 1;
+    currentFig(round(gridRows(:)), :, :) = 255;
+    gridCols = handles.gridCols;
+    gridCols(gridCols == 0) = 1;
+    currentFig(:, round(gridCols(:)), :) = 255;
     imshow(currentFig);
 end
 
@@ -1077,6 +1117,8 @@ function blue_button_Callback(hObject, eventdata, handles)
             handles.blueLayer = imshow(blue);
             set(handles.blueLayer, 'AlphaData', handles.imgBlue);
             hold off
+            clc;
+            disp('Blue Cells');
             [stats, block] = getCount(handles, handles.imgBlue);
             set(handles.blue_edit, 'String', numel(stats));
             handles.blueStats = stats;
@@ -1104,6 +1146,8 @@ function green_button_Callback(hObject, eventdata, handles)
             handles.greenLayer = imshow(green);
             set(handles.greenLayer, 'AlphaData', handles.imgGreen);
             hold off
+            clc;
+            disp('Green Cells');
             [stats, block] = getCount(handles, handles.imgGreen);
             set(handles.green_edit, 'String', numel(stats));
             handles.greenStats = stats;
@@ -1130,6 +1174,8 @@ function red_button_Callback(hObject, eventdata, handles)
             handles.redLayer = imshow(red);
             set(handles.redLayer, 'AlphaData', handles.imgRed);
             hold off
+            clc;
+            disp('Red Cells');
             [stats, block] = getCount(handles, handles.imgRed);
             set(handles.red_edit, 'String', numel(stats));
             handles.redStats = stats;
@@ -1156,6 +1202,8 @@ function blue_green_button_Callback(hObject, eventdata, handles)
             handles.blueGreenLayer = imshow(BG);
             set(handles.blueGreenLayer, 'AlphaData', handles.imgBlueGreen);
             hold off
+            clc;
+            disp('Blue/Green (Cyan) Cells');
             [stats, block] = getCount(handles, handles.imgBlueGreen);
             set(handles.blueGreen_edit, 'String', numel(stats));
             handles.blueGreenStats = stats;
@@ -1183,6 +1231,8 @@ function blue_red_button_Callback(hObject, eventdata, handles)
             handles.blueRedLayer = imshow(BR);
             set(handles.blueRedLayer, 'AlphaData', handles.imgBlueRed);
             hold off
+            clc;
+            disp('Blue/Red (Magenta) Cells');
             [stats, block] = getCount(handles, handles.imgBlueRed);
             set(handles.blueRed_edit, 'String', numel(stats));
             handles.blueRedStats = stats;
@@ -1209,6 +1259,8 @@ function green_red_button_Callback(hObject, eventdata, handles)
             handles.greenRedLayer = imshow(GR);
             set(handles.greenRedLayer, 'AlphaData', handles.imgGreenRed);
             hold off
+            clc;
+            disp('Green/Red (Yellow) Cells');
             [stats, block] = getCount(handles, handles.imgGreenRed);
             set(handles.greenRed_edit, 'String', numel(stats));
             handles.greenRedStats = stats;
@@ -1235,6 +1287,8 @@ function blue_green_red_button_Callback(hObject, eventdata, handles)
             handles.blueGreenRedLayer = imshow(BGR);
             set(handles.blueGreenRedLayer, 'AlphaData', handles.imgBlueGreenRed);
             hold off
+            clc;
+            disp('Blue/Green/Red (Black) Cells');
             [stats, block] = getCount(handles, handles.imgBlueGreenRed);
             set(handles.blueGreenRed_edit, 'String', numel(stats));
             handles.blueGreenRedStats = stats;
@@ -1412,78 +1466,85 @@ end
 function plot_button_Callback(hObject, eventdata, handles)
     cla;
     if(isfield(handles, 'redStats'))
+        color = [1 0 0];
         for i = 1:numel(handles.redStats)
             centroid = handles.redStats(i).Centroid;
             x = centroid(1);
             y = centroid(2);
             hold on;
-            plot(x, y, 'ro');
+            plot(x, y, 'o', 'MarkerEdgeColor', color, 'MarkerFaceColor', color);
             hold off;
         end
     end
     
     if(isfield(handles, 'blueStats'))
+        color = [0 0 1];
         for i = 1:numel(handles.blueStats)
             centroid = handles.blueStats(i).Centroid;
             x = centroid(1);
             y = centroid(2);
             hold on;
-            plot(x, y, 'bo');
+            plot(x, y, 'o', 'MarkerEdgeColor', color, 'MarkerFaceColor', color);
             hold off;
         end
     end
     
     if(isfield(handles, 'greenStats'))
+        color = [0 1 0];
         for i = 1:numel(handles.greenStats)
             centroid = handles.greenStats(i).Centroid;
             x = centroid(1);
             y = centroid(2);
             hold on;
-            plot(x, y, 'go');
+            plot(x, y, 'o', 'MarkerEdgeColor', color, 'MarkerFaceColor', color);
             hold off;
         end
     end
     
     if(isfield(handles, 'blueGreenStats'))
+        color = [0 1 1];
         for  i = 1:numel(handles.blueGreenStats)
             centroid = handles.blueGreenStats(i).Centroid;
             x = centroid(1);
             y = centroid(2);
             hold on;
-            plot(x, y, 'co');
+            plot(x, y, 'o', 'MarkerEdgeColor', color, 'MarkerFaceColor', color);
             hold off;
         end
     end
     
     if(isfield(handles, 'blueRedStats'))
+        color = [1 0 1];
         for i = 1:numel(handles.blueRedStats)
             centroid = handles.blueRedStats(i).Centroid;
             x = centroid(1);
             y = centroid(2);
             hold on;
-            plot(x, y, 'mo');
+            plot(x, y, 'o', 'MarkerEdgeColor', color, 'MarkerFaceColor', color);
             hold off;
         end
     end
     
     if(isfield(handles, 'greenRedStats'))
+        color = [1 0.6 .2];
         for i = 1:numel(handles.greenRedStats)
             centroid = handles.greenRedStats(i).Centroid;
             x = centroid(1);
             y = centroid(2);
             hold on;
-            plot(x, y, 'yo');
+            plot(x, y, 'o', 'MarkerEdgeColor', color, 'MarkerFaceColor', color);
             hold off;
         end
     end
     
     if(isfield(handles, 'blueGreenRedStats'))
+        color = [0 0 0];
         for i = 1:numel(handles.blueGreenRedStats)
             centroid = handles.blueGreenRedStats(i).Centroid;
             x = centroid(1);
             y = centroid(2);
             hold on;
-            plot(x, y, 'ko');
+            plot(x, y, 'o', 'MarkerEdgeColor', color, 'MarkerFaceColor', color);
             hold off;
         end
     end
@@ -1592,4 +1653,19 @@ function mask2_pop_CreateFcn(hObject, eventdata, handles)
     if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
     end
+end
+
+
+% --- Executes on button press in overlay2_button.
+function overlay2_button_Callback(hObject, eventdata, handles)
+    toggle = get(handles.overlay2_button, 'Value');
+        if (toggle == get(handles.green_button, 'Max'))
+            handles.overlayImg = imshow(handles.img);
+        elseif (toggle == get(handles.overlay2_button, 'Min'))
+            try
+                delete(handles.overlayImg);
+            catch err
+            end
+        end
+        guidata(hObject, handles);
 end

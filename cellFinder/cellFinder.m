@@ -247,7 +247,7 @@ function centroidsSave_menu_Callback(hObject, eventdata, handles)
         xBlueGreenRed = zeros(numel(handles.blueGreenRedStats), 1);
         yBlueGreenRed = zeros(numel(handles.blueGreenRedStats), 1);
         cBlueGreenRed = zeros(numel(handles.blueGreenRedStats), 1);
-        for i = numel(handles.blueGreenRedStats)
+        for i = 1:numel(handles.blueGreenRedStats)
             centroid = handles.blueGreenRedStats(i).Centroid;
             xBlueGreenRed(i) = centroid(1) - xo;
             yBlueGreenRed(i) = centroid(2) - yo;

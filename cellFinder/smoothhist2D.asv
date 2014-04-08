@@ -19,9 +19,7 @@ function smoothhist2D(X,lambda,nbins,outliercutoff,plottype)
 %   the surface plot does not include outliers.
 %
 %   SMOOTHHIST2D(X,LAMBDA,NBINS,[],'contour') plots a contour map of the
-%   data in X. SMOOTHHIST2D ignores the CUTOFF input in this case, and
-%   the contour plot does not include outliers. 
-%   [Added by Henry Kao 04/08/14]
+%   data in X
 %
 %   SMOOTHHIST2D(X,LAMBDA,NBINS,CUTOFF,'image') plots the histogram as an
 %   image plot, the default.

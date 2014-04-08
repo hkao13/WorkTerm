@@ -22,7 +22,7 @@ function varargout = plotData(varargin)
 
 % Edit the above text to modify the response to help plotData
 
-% Last Modified by GUIDE v2.5 08-Apr-2014 11:04:58
+% Last Modified by GUIDE v2.5 08-Apr-2014 16:13:00
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -60,6 +60,10 @@ guidata(hObject, handles);
 
 % UIWAIT makes plotData wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
+set(handles.marker_edit, 'String', '5');
+set(handles.smoothing_edit, 'String', '0.5');
+set(handles.xbin_edit, 'String', '50');
+set(handles.ybin_edit, 'String', '50');
 
 
 % --- Outputs from this function are returned to the command line.
@@ -84,22 +88,63 @@ function directory_button_Callback(hObject, eventdata, handles)
             handles.data = vertcat(handles.data, importdata(fileName));
         end
     end
+    fprintf('\nFolder: %s\n', folder);
     guidata(hObject, handles);
 
 % --- Executes on button press in plot_button.
 function plot_button_Callback(hObject, eventdata, handles)
-    % x coordinate of centroid in first column.
-    xx = handles.data(:, 1);
-    % y cooordinate of centroid in second column.
-    yy = handles.data(:, 2);
-    % color code of coordinate in third column.
-    color = handles.data(:, 3);
+
+    close(findobj('Type', 'Figure', 'Name', 'Centroids'));
+    close(findobj('Type', 'Figure', 'Name', 'Density Plot'));
+    close(findobj('Type', 'Figure', 'Name', 'Contour Plot'));
+
+    circleSize = str2double(get(handles.marker_edit, 'String'));
+    smoothing = str2double(get(handles.smoothing_edit, 'String'));
+    xBin = str2double(get(handles.xbin_edit, 'String'));
+    yBin = str2double(get(handles.ybin_edit, 'String'));
+    nBin = [xBin yBin];
+
+    dataH = handles.data;
+    if (get(handles.r_check, 'Value') == 0)
+        dataH = removerows(dataH, find(dataH(:,3) == 1));
+    end
     
-    figure(101);
+    if (get(handles.g_check, 'Value') == 0)
+        dataH = removerows(dataH, find(dataH(:,3) == 2));
+    end
+    
+    if (get(handles.b_check, 'Value') == 0)
+        dataH = removerows(dataH, find(dataH(:,3) == 3));
+    end
+   
+    if (get(handles.rg_check, 'Value') == 0)
+        dataH = removerows(dataH, find(dataH(:,3) == 12));
+    end
+    
+    if (get(handles.rb_check, 'Value') == 0)
+        dataH = removerows(dataH, find(dataH(:,3) == 13));
+    end
+    
+    if (get(handles.gb_check, 'Value') == 0)
+        dataH = removerows(dataH, find(dataH(:,3) == 23));
+    end
+    
+    if (get(handles.rgb_check, 'Value') == 0)
+        dataH = removerows(dataH, find(dataH(:,3) == 123));
+    end
+
+    % x coordinate of centroid in first column.
+    xx = dataH(:, 1);
+    % y cooordinate of centroid in second column.
+    yy = dataH(:, 2);
+    % color code of coordinate in third column.
+    color = dataH(:, 3);
+    
+    hFig1 = figure(101);
+    set(hFig1, 'Name', 'Centroids');
     hold on
     axis ij;
     % For loop to plot data.
-    CircleSize = 5; % Change number for size of the Markers.
     for i = 1:numel(xx)
         x = xx(i);
         y = yy(i);
@@ -107,26 +152,46 @@ function plot_button_Callback(hObject, eventdata, handles)
         switch c
             case 1 
                 c = [1 0 0];        % Red Cells
+                
             case 2
                 c = [0 1 0];        % Green Cells
+                
             case 3
                 c = [0 0 1];        % Blue Cells
+                
             case 12
                 c = [1 0.6 .2];     % Red/Green (Yellow) Cells
+                
             case 13
                 c = [1 0 1];        % Red/Blue (Magenta) Cells
+                
             case 23
                 c = [0 1 1];        % Blue/Green (Cyan) Cells
+                
             case 123
                 c = [0 0 0];        % Red/Green/Blue (Black, actually supposed to be White) Cells
         end
-        plot(x, y, 'o', 'MarkerEdgeColor', c, 'MarkerFaceColor', c, 'MarkerSize', CircleSize);   
+        plot(x, y, 'o', 'MarkerEdgeColor', c, 'MarkerFaceColor', c, 'MarkerSize', circleSize);   
     end
     xlabel('X-Axis');
     ylabel('Y-Axis');
     hold off
+        
+    hFig2 = figure(102);
+    set(hFig2, 'Name', 'Density Plot');
+    axis ij
+    hold on
+    smoothhist2D([xx yy], smoothing, nBin, [], 'surf');
+    hold off
     
-%     % End of plotting the data.
+    hFig3 = figure(103);
+    set(hFig3, 'Name', 'Contour Plot');
+    axis ij
+    hold on
+    smoothhist2D([xx yy], smoothing, nBin, [], 'contour');
+    hold off
+
+    %     % End of plotting the data.
 %     n = 5;
 %     xxi = linspace(min(xx(:)), max(xx(:)), n);
 %     yyi = linspace(min(yy(:)), max(yy(:)), n);
@@ -153,17 +218,76 @@ function plot_button_Callback(hObject, eventdata, handles)
 %     contour(zz);
 %     camroll(270);
 %     hold off
-    
-    figure(102)
-    axis ij
-    hold on
-    smoothhist2D([xx yy], 0.5, [50,50], [], 'surf');
-    hold off
-    
-    figure(103)
-    axis ij
-    hold on
-    smoothhist2D([xx yy], 0.5, [50,50], [], 'contour');
-    hold off
-    
-    
+
+
+% --- Executes on button press in closeFig_button.
+function closeFig_button_Callback(hObject, eventdata, handles)
+    close(findobj('Type', 'Figure', 'Name', 'Centroids'));
+    close(findobj('Type', 'Figure', 'Name', 'Density Plot'));
+    close(findobj('Type', 'Figure', 'Name', 'Contour Plot'));
+
+function marker_edit_Callback(hObject, eventdata, handles)
+
+% --- Executes during object creation, after setting all properties.
+function marker_edit_CreateFcn(hObject, eventdata, handles)
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+
+
+
+function smoothing_edit_Callback(hObject, eventdata, handles)
+
+% --- Executes during object creation, after setting all properties.
+function smoothing_edit_CreateFcn(hObject, eventdata, handles)
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+
+
+
+function xbin_edit_Callback(hObject, eventdata, handles)
+
+% --- Executes during object creation, after setting all properties.
+function xbin_edit_CreateFcn(hObject, eventdata, handles)
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+
+
+
+function ybin_edit_Callback(hObject, eventdata, handles)
+
+% --- Executes during object creation, after setting all properties.
+function ybin_edit_CreateFcn(hObject, eventdata, handles)
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+
+
+% --- Executes on button press in r_check.
+function r_check_Callback(hObject, eventdata, handles)
+
+
+% --- Executes on button press in g_check.
+function g_check_Callback(hObject, eventdata, handles)
+
+
+% --- Executes on button press in b_check.
+function b_check_Callback(hObject, eventdata, handles)
+
+
+% --- Executes on button press in rg_check.
+function rg_check_Callback(hObject, eventdata, handles)
+
+
+% --- Executes on button press in rb_check.
+function rb_check_Callback(hObject, eventdata, handles)
+
+
+% --- Executes on button press in gb_check.
+function gb_check_Callback(hObject, eventdata, handles)
+
+
+% --- Executes on button press in rgb_check.
+function rgb_check_Callback(hObject, eventdata, handles)

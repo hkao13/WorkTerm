@@ -22,7 +22,7 @@ function varargout = plotData(varargin)
 
 % Edit the above text to modify the response to help plotData
 
-% Last Modified by GUIDE v2.5 07-Apr-2014 14:29:29
+% Last Modified by GUIDE v2.5 08-Apr-2014 16:13:00
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -60,6 +60,10 @@ guidata(hObject, handles);
 
 % UIWAIT makes plotData wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
+set(handles.marker_edit, 'String', '5');
+set(handles.smoothing_edit, 'String', '0.5');
+set(handles.xbin_edit, 'String', '50');
+set(handles.ybin_edit, 'String', '50');
 
 
 % --- Outputs from this function are returned to the command line.
@@ -84,21 +88,36 @@ function directory_button_Callback(hObject, eventdata, handles)
             handles.data = vertcat(handles.data, importdata(fileName));
         end
     end
+    fprintf('\nFolder: %s\n', folder);
     guidata(hObject, handles);
-
-
-function division_edit_Callback(hObject, eventdata, handles)
-
-
-% --- Executes during object creation, after setting all properties.
-function division_edit_CreateFcn(hObject, eventdata, handles)
-    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-        set(hObject,'BackgroundColor','white');
-    end
-
 
 % --- Executes on button press in plot_button.
 function plot_button_Callback(hObject, eventdata, handles)
+
+    close(findobj('Type', 'Figure', 'Name', 'Centroids'));
+    close(findobj('Type', 'Figure', 'Name', 'Density Plot'));
+    close(findobj('Type', 'Figure', 'Name', 'Contour Plot'));
+
+    circleSize = str2double(get(handles.marker_edit, 'String'));
+    smoothing = str2double(get(handles.smoothing_edit, 'String'));
+    xBin = str2double(get(handles.xbin_edit, 'String'));
+    yBin = str2double(get(handles.ybin_edit, 'String'));
+    nBin = [xBin yBin];
+
+    ind = [];
+    if (get(handles.r_check, 'Value') == 0)
+        vertcat(ind, find(handles.data(:,3) == 1));
+    end
+    
+    if (get(handles.g_check, 'Value') == 0)
+        vertcat(ind, find(handles.data(:,3) == 2));
+    end
+    
+    if (get(handles.b_check, 'Value') == 0)
+        vertcat(ind, find(handles.data(:,3) == 3));
+    end
+   
+    data = removerows(handles.data, ind);
     % x coordinate of centroid in first column.
     xx = handles.data(:, 1);
     % y cooordinate of centroid in second column.
@@ -106,11 +125,11 @@ function plot_button_Callback(hObject, eventdata, handles)
     % color code of coordinate in third column.
     color = handles.data(:, 3);
     
-    figure(101);
+    hFig1 = figure(101);
+    set(hFig1, 'Name', 'Centroids');
     hold on
     axis ij;
     % For loop to plot data.
-    CircleSize = 5; % Change number for size of the Markers.
     for i = 1:numel(xx)
         x = xx(i);
         y = yy(i);
@@ -118,60 +137,142 @@ function plot_button_Callback(hObject, eventdata, handles)
         switch c
             case 1 
                 c = [1 0 0];        % Red Cells
+                
             case 2
                 c = [0 1 0];        % Green Cells
+                
             case 3
                 c = [0 0 1];        % Blue Cells
+                
             case 12
                 c = [1 0.6 .2];     % Red/Green (Yellow) Cells
+                
             case 13
                 c = [1 0 1];        % Red/Blue (Magenta) Cells
+                
             case 23
                 c = [0 1 1];        % Blue/Green (Cyan) Cells
+                
             case 123
                 c = [0 0 0];        % Red/Green/Blue (Black, actually supposed to be White) Cells
         end
-        plot(x, y, 'o', 'MarkerEdgeColor', c, 'MarkerFaceColor', c, 'MarkerSize', CircleSize);   
+        plot(x, y, 'o', 'MarkerEdgeColor', c, 'MarkerFaceColor', c, 'MarkerSize', circleSize);   
     end
     xlabel('X-Axis');
     ylabel('Y-Axis');
     hold off
-    
-    % End of plotting the data.
-    n = 5;
-    xxi = linspace(min(xx(:)), max(xx(:)), n);
-    yyi = linspace(min(yy(:)), max(yy(:)), n);
-
-    % Groups data.
-    xxr = interp1(xxi, 1:numel(xxi), xx, 'nearest');
-    yyr = interp1(yyi, 1:numel(yyi), yy, 'nearest');
-
-    % Makes matrix.
-    zz = accumarray([xxr yyr], 1, [n n]);
-    figure(102)
-    hold on
-    % Creates Heat/Density Map.
-    surf(zz)
-%     camroll(270);
-    xlabel('X-Axis');
-    ylabel('Y-Axis');
-    hold off
-    
-   % Sets subplot 3 of figure(2) to current axes.
-    figure(103)
-    hold on
-    % Creates contour plot.
-    contour(zz);
-%     camroll(270);
-    hold off
-    
-    figure(104)
+        
+    hFig2 = figure(102);
+    set(hFig2, 'Name', 'Density Plot');
     axis ij
     hold on
-    smoothhist2D([xx yy], 0.5, [20,20], [], 'surf');
+    smoothhist2D([xx yy], smoothing, nBin, [], 'surf');
     hold off
     
-    figure(105)
+    hFig3 = figure(103);
+    set(hFig3, 'Name', 'Contour Plot');
     axis ij
     hold on
-    cntour(
+    smoothhist2D([xx yy], smoothing, nBin, [], 'contour');
+    hold off
+
+    %     % End of plotting the data.
+%     n = 5;
+%     xxi = linspace(min(xx(:)), max(xx(:)), n);
+%     yyi = linspace(min(yy(:)), max(yy(:)), n);
+% 
+%     % Groups data.
+%     xxr = interp1(xxi, 1:numel(xxi), xx, 'nearest');
+%     yyr = interp1(yyi, 1:numel(yyi), yy, 'nearest');
+% 
+%     % Makes matrix.
+%     zz = accumarray([xxr yyr], 1, [n n]);
+%     figure(104)
+%     hold on
+%     % Creates Heat/Density Map.
+%     surf(zz)
+%     camroll(270);
+%     xlabel('X-Axis');
+%     ylabel('Y-Axis');
+%     hold off
+%     
+%    % Sets subplot 3 of figure(2) to current axes.
+%     figure(105)
+%     hold on
+%     % Creates contour plot.
+%     contour(zz);
+%     camroll(270);
+%     hold off
+
+
+% --- Executes on button press in closeFig_button.
+function closeFig_button_Callback(hObject, eventdata, handles)
+    close(findobj('Type', 'Figure', 'Name', 'Centroids'));
+    close(findobj('Type', 'Figure', 'Name', 'Density Plot'));
+    close(findobj('Type', 'Figure', 'Name', 'Contour Plot'));
+
+function marker_edit_Callback(hObject, eventdata, handles)
+
+% --- Executes during object creation, after setting all properties.
+function marker_edit_CreateFcn(hObject, eventdata, handles)
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+
+
+
+function smoothing_edit_Callback(hObject, eventdata, handles)
+
+% --- Executes during object creation, after setting all properties.
+function smoothing_edit_CreateFcn(hObject, eventdata, handles)
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+
+
+
+function xbin_edit_Callback(hObject, eventdata, handles)
+
+% --- Executes during object creation, after setting all properties.
+function xbin_edit_CreateFcn(hObject, eventdata, handles)
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+
+
+
+function ybin_edit_Callback(hObject, eventdata, handles)
+
+% --- Executes during object creation, after setting all properties.
+function ybin_edit_CreateFcn(hObject, eventdata, handles)
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+
+
+% --- Executes on button press in r_check.
+function r_check_Callback(hObject, eventdata, handles)
+
+
+% --- Executes on button press in g_check.
+function g_check_Callback(hObject, eventdata, handles)
+
+
+% --- Executes on button press in b_check.
+function b_check_Callback(hObject, eventdata, handles)
+
+
+% --- Executes on button press in rg_check.
+function rg_check_Callback(hObject, eventdata, handles)
+
+
+% --- Executes on button press in rb_check.
+function rb_check_Callback(hObject, eventdata, handles)
+
+
+% --- Executes on button press in gb_check.
+function gb_check_Callback(hObject, eventdata, handles)
+
+
+% --- Executes on button press in rgb_check.
+function rgb_check_Callback(hObject, eventdata, handles)

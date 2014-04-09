@@ -22,7 +22,7 @@ function varargout = cellFinder(varargin)
 
 % Edit the above text to modify the response to help cellFinder
 
-% Last Modified by GUIDE v2.5 07-Apr-2014 12:10:40
+% Last Modified by GUIDE v2.5 09-Apr-2014 11:25:32
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -436,6 +436,10 @@ function stuff_menu_Callback(hObject, eventdata, handles)
     guidata(hObject, handles);
 end
 
+% --------------------------------------------------------------------
+function plotDataGUI_menu_Callback(hObject, eventdata, handles)
+    plotData;
+end
 % --------------------------------------------------------------------
 function settings_menu_Callback(hObject, eventdata, handles)
 % hObject    handle to settings_menu (see GCBO)
@@ -949,7 +953,6 @@ function count_button_Callback(hObject, eventdata, handles)
     set(handles.count_edit, 'String', numel(handles.stats));
        
     if (isfield(handles, 'gridRows') || isfield(handles, 'gridCols'))
-        imageSize = size(handles.img);
         gridRows = handles.gridRows;
         gridCols = handles.gridCols;
         height = diff(gridRows);
@@ -1047,6 +1050,82 @@ function count_button_Callback(hObject, eventdata, handles)
     guidata(hObject, handles);
 end
     
+function [stats, block] = getCount(handles, image)
+    label = logical(image);
+    stats = regionprops(label, 'Centroid');
+    set(handles.count_edit, 'String', numel(stats));
+       
+    if (isfield(handles, 'gridRows') || isfield(handles, 'gridCols'))
+        gridRows = handles.gridRows;
+        gridCols = handles.gridCols;
+        height = diff(gridRows);
+        width = diff(gridCols);
+        sections = 1:(numel(width) * numel(height));
+
+        gridCols2 = gridCols(1:end - 1);
+        gridCols3 = gridCols(2:end);
+        gridRows2 = gridRows(1:end - 1);
+        gridRows3 = gridRows(2:end);
+
+        multiple1 = numel(sections) / numel(gridCols2);
+        xMin = cell(1, multiple1);
+        xMax = cell(1, multiple1);
+        for i = 1:numel(xMin)
+            xMin{i} = gridCols2;
+            xMax{i} = gridCols3;
+        end
+        xMin = cell2mat(xMin);
+        xMax = cell2mat(xMax);
+
+        multiple2 = numel(sections) / numel(gridRows2);
+        yMin = cell(1, multiple2);
+        yMax = cell(1, multiple2);
+        for i = 1:numel(yMin)
+            yMin{i} = gridRows2;
+            yMax{i} = gridRows3;        
+        end
+        yMin = cell2mat(yMin);  
+        yMin = sort(yMin, 'ascend');
+        yMax = cell2mat(yMax);
+        yMax = sort(yMax, 'ascend');
+
+        allocateCell = cell(1, numel(sections)); 
+        block = struct('blockNumber', allocateCell,...
+            'xMinimum', allocateCell, 'xMaximum', allocateCell,...
+            'yMinimum', allocateCell, 'yMaximum', allocateCell,...
+            'cellCount', allocateCell);
+
+        for i = 1:numel(sections)
+            block(i).blockNumber = i;
+            block(i).xMinimum = xMin(i);
+            block(i).xMaximum = xMax(i);
+            block(i).yMinimum = yMin(i);
+            block(i).yMaximum = yMax(i);
+            block(i).cellCount = 0;
+        end
+
+        for i = 1:numel(stats)
+            centroid = stats(i).Centroid;
+            xx = centroid(1);
+            yy = centroid(2);
+            for j = 1:numel(block)
+                cond1 = (xx > block(j).xMinimum) && (xx < block(j).xMaximum);
+                cond2 = (yy > block(j).yMinimum) && (yy < block(j).yMaximum);
+                cellCount = block(j).cellCount;
+                if ( (cond1 == 1) && (cond2 == 1))
+                    block(j).cellCount = cellCount + 1;
+                end
+            end     
+        end
+        
+        for i = 1:numel(block);
+            fprintf('Block: %d\t-\tCell Count: %d\n', block(i).blockNumber, block(i).cellCount); 
+        end
+        fprintf('\n');
+    end
+end
+
+
 function count_edit_Callback(hObject, eventdata, handles)
 end
     
@@ -1382,85 +1461,6 @@ function blueGreenRed_edit_CreateFcn(hObject, eventdata, handles)
         set(hObject,'BackgroundColor','white');
     end
 end
-
-function [stats, block] = getCount(handles, image)
-    label = logical(image);
-    stats = regionprops(label, 'Centroid');
-    set(handles.count_edit, 'String', numel(stats));
-       
-    if (isfield(handles, 'gridRows') || isfield(handles, 'gridCols'))
-        imageSize = size(handles.img);
-        gridRows = [0, handles.gridRows, imageSize(1)];
-        gridCols = [0, handles.gridCols, imageSize(2)];
-        height = diff(gridRows);
-        width = diff(gridCols);
-        sections = 1:(numel(width) * numel(height));
-
-        gridCols2 = gridCols(1:end - 1);
-        gridCols3 = gridCols(2:end);
-        gridRows2 = gridRows(1:end - 1);
-        gridRows3 = gridRows(2:end);
-
-        multiple1 = numel(sections) / numel(gridCols2);
-        xMin = cell(1, multiple1);
-        xMax = cell(1, multiple1);
-        for i = 1:numel(xMin)
-            xMin{i} = gridCols2;
-            xMax{i} = gridCols3;
-        end
-        xMin = cell2mat(xMin);
-        xMax = cell2mat(xMax);
-
-        multiple2 = numel(sections) / numel(gridRows2);
-        yMin = cell(1, multiple2);
-        yMax = cell(1, multiple2);
-        for i = 1:numel(yMin)
-            yMin{i} = gridRows2;
-            yMax{i} = gridRows3;        
-        end
-        yMin = cell2mat(yMin);  
-        yMin = sort(yMin, 'ascend');
-        yMax = cell2mat(yMax);
-        yMax = sort(yMax, 'ascend');
-
-        allocateCell = cell(1, numel(sections)); 
-        block = struct('blockNumber', allocateCell,...
-            'xMinimum', allocateCell, 'xMaximum', allocateCell,...
-            'yMinimum', allocateCell, 'yMaximum', allocateCell,...
-            'cellCount', allocateCell);
-
-        for i = 1:numel(sections)
-            block(i).blockNumber = i;
-            block(i).xMinimum = xMin(i);
-            block(i).xMaximum = xMax(i);
-            block(i).yMinimum = yMin(i);
-            block(i).yMaximum = yMax(i);
-            block(i).cellCount = 0;
-        end
-
-        for i = 1:numel(stats)
-            centroid = stats(i).Centroid;
-            xx = centroid(1);
-            yy = centroid(2);
-            for j = 1:numel(block)
-                cond1 = (xx > block(j).xMinimum) && (xx < block(j).xMaximum);
-                cond2 = (yy > block(j).yMinimum) && (yy < block(j).yMaximum);
-                cellCount = block(j).cellCount;
-                if ( (cond1 == 1) && (cond2 == 1))
-                    block(j).cellCount = cellCount + 1;
-                end
-            end     
-        end
-
-        for i = 1:numel(block);
-            fprintf('Block: %d\t-\tCell Count: %d\n', block(i).blockNumber, block(i).cellCount); 
-        end
-        fprintf('\n');
-    else
-        block = NaN;
-    end
-end
-
 
 % --- Executes on button press in plot_button.
 function plot_button_Callback(hObject, eventdata, handles)

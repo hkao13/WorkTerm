@@ -637,7 +637,15 @@ end
 
 % --- Executes on button press in contrast_button.
 function contrast_button_Callback(hObject, eventdata, handles)
-    handles.imgGray = rgb2gray(handles.img);
+    if (get(handles.red_radio, 'Value') == 1)
+        handles.imgGray = handles.img(:, :, 1);
+    elseif (get(handles.green_radio, 'Value') == 1)
+        handles.imgGray = handles.img(:, :, 2);
+    elseif (get(handles.blue_radio, 'Value') == 1)
+        handles.imgGray = handles.img(:, :, 3);
+    else
+        handles.imgGray = rgb2gray(handles.img);
+    end
     handles.imgGrayContrast = adapthisteq(handles.imgGray);
     handles.fig = handles.imgGrayContrast;
     imshow(handles.imgGrayContrast);

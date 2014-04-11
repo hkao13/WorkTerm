@@ -1060,24 +1060,47 @@ end
 % --- Executes on button press in settings0_GUI_button.
 % Opens a settings GUI for the cell panels.
 function settings0_GUI_button_Callback(hObject, eventdata, handles)
-    engSettings0;
+    setGUI = engSettings0;
+    waitfor(setGUI);
+    handles.cellSpike = getappdata(0, 'cellSpike');
+    handles.cellTrough = getappdata(0, 'cellTrough');
+    handles.cellBurst = getappdata(0, 'cellBurst');
+    guidata(hObject, handles);
 end
 
 % --- Executes on button press in settings1_GUI_button.
 % Opens a settings GUI for the root 1 panels.
 function settings1_GUI_button_Callback(hObject, eventdata, handles)
-    engSettings;
+    setGUI = engSettings;
+    waitfor(setGUI);
+    handles.spike = getappdata(0, 'spike');
+    handles.burst = getappdata(0, 'burst');
+    handles.trough = getappdata(0, 'trough');
+    handles.percent = getappdata(0, 'percent');
+    guidata(hObject, handles);
 end
 
 % --- Executes on button press in settings2_GUI_button.
 % Opens a settings GUI for the root 2 panels.
 function settings2_GUI_button_Callback(hObject, eventdata, handles)
-    engSettings2;
+    setGUI = engSettings2;
+    waitfor(setGUI);
+    handles.spike2 = getappdata(0, 'spike2');
+    handles.burst2 = getappdata(0, 'burst2');
+    handles.trough2 = getappdata(0, 'trough2');
+    handles.percent2 = getappdata(0, 'percent2');
+    guidata(hObject, handles);
 end
 
 % --- Executes on button press in settings3_GUI_button.
 function settings3_GUI_button_Callback(hObject, eventdata, handles)
-    engSettings3;
+    setGUI = engSettings3;
+    waitfor(setGUI);
+    handles.spike3 = getappdata(0, 'spike3');
+    handles.burst3 = getappdata(0, 'burst3');
+    handles.trough3 = getappdata(0, 'trough3');
+    handles.percent3 = getappdata(0, 'percent3');
+    guidata(hObject, handles);
 end
 
 % -------------------------------------------------------------------------

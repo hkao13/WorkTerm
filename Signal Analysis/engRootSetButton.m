@@ -24,14 +24,14 @@ switch identity
         % Gets the time, potential, threshold and the span, factor,
         % spike, trough, burst, percent settings.
         handles.threshold1 = str2double(get(handles.thresh_root1_edit, 'String'));
-        time        = getappdata(0, 'time');
-        potential   = getappdata(0, 'root1');
-        span        = getappdata(0, 'span');
-        factor      = getappdata(0, 'factor');
-        spike       = getappdata(0, 'spike');
-        trough      = getappdata(0, 'trough');
-        burst       = getappdata(0, 'burst');
-        percent     = getappdata(0, 'percent');
+        time        = handles.time;
+        potential   = handles.root1;
+        span        = handles.span;
+        factor      = handles.factor;
+        spike       = handles.spike;
+        trough      = handles.trough;
+        burst       = handles.burst;
+        percent     = handles.percent;
         % If the value within the theshold edit box in root 1 panel is not
         % a number, will prompt to enter a threahold value, else it will
         % create the root object for burst detection.
@@ -61,14 +61,14 @@ switch identity
         % Gets the time, potential, threshold and the span, factor,
         % spike, trough, burst, percent settings.
         handles.threshold2 = str2double(get(handles.thresh_root2_edit, 'String'));
-        time        = getappdata(0, 'time');
-        potential   = getappdata(0, 'root2');
-        span        = getappdata(0, 'span');
-        factor      = getappdata(0, 'factor');
-        spike       = getappdata(0, 'spike2');
-        trough      = getappdata(0, 'trough2');
-        burst       = getappdata(0, 'burst2');
-        percent     = getappdata(0, 'percent2');
+        time        = handles.time;
+        potential   = handles.root2;
+        span        = handles.span;
+        factor      = handles.factor;
+        spike       = handles.spike2;
+        trough      = handles.trough2;
+        burst       = handles.burst2;
+        percent     = handles.percent2;
         % If the value within the theshold edit box in root 2 panel is not
         % a number, will prompt to enter a threahold value, else it will
         % create the root object for burst detection.
@@ -98,14 +98,14 @@ switch identity
         % Gets the time, potential, threshold and the span, factor,
         % spike, trough, burst, percent settings.
         handles.threshold3 = str2double(get(handles.thresh_root3_edit, 'String'));
-        time        = getappdata(0, 'time');
-        potential   = getappdata(0, 'root3');
-        span        = getappdata(0, 'span');
-        factor      = getappdata(0, 'factor');
-        spike       = getappdata(0, 'spike3');
-        trough      = getappdata(0, 'trough3');
-        burst       = getappdata(0, 'burst3');
-        percent     = getappdata(0, 'percent3');
+        time        = handles.time;
+        potential   = handles.root3;
+        span        = handles.span;
+        factor      = handles.factor;
+        spike       = handles.spike3;
+        trough      = handles.trough3;
+        burst       = handles.burst3;
+        percent     = handles.percent3;
         % If the value within the theshold edit box in root 3 panel is not
         % a number, will prompt to enter a threahold value, else it will
         % create the root object for burst detection.

@@ -176,20 +176,24 @@ function plot_button_Callback(hObject, eventdata, handles)
     xlabel('X-Axis');
     ylabel('Y-Axis');
     hold off
+    lim = axis;
         
     hFig2 = figure(102);
     set(hFig2, 'Name', 'Density Plot');
+    axis(lim);
     axis ij
     hold on
-    smoothhist2D([xx yy], smoothing, nBin, [], 'surf');
+    smoothhist2D([xx yy], lim, smoothing, nBin, [], 'surf');
     hold off
     
     hFig3 = figure(103);
     set(hFig3, 'Name', 'Contour Plot');
+    axis(lim);
     axis ij
     hold on
-    smoothhist2D([xx yy], smoothing, nBin, [], 'contour');
+    smoothhist2D([xx yy], lim, smoothing, nBin, [], 'contour');
     hold off
+
 
     %     % End of plotting the data.
 %     n = 5;

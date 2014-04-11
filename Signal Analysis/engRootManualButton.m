@@ -19,8 +19,8 @@ switch identity
         % Gets the time, potential, threshold and baseline. Threshold and
         % baseline are set to NaN because the cell object does not need
         % them to determine bursts.
-        time        = getappdata(0, 'time');
-        potential   = getappdata(0, 'cell');
+        time        = handles.time;
+        potential   = handles.cell;
         threshold   = str2double(get(handles.thresh_cell_edit, 'String'));
         baseline    = NaN;
         % Try-catch block determines if cellOnset and cellOffset already
@@ -52,8 +52,8 @@ switch identity
             baseline = handles.baseline1;
         end
         % Gets the time, potential, threshold.
-        time        = getappdata(0, 'time');
-        potential   = getappdata(0, 'root1');
+        time        = handles.time;
+        potential   = handles.root1;
         threshold = str2double(get(handles.thresh_root1_edit, 'String'));
         % Try-catch block determines if rootOnset1 and rootOffset1 already
         % exist within the GUI handle structure. If they do, manual mode
@@ -84,8 +84,8 @@ switch identity
             baseline = handles.baseline2;
         end
         % Gets the time, potential, threshold.
-        time        = getappdata(0, 'time');
-        potential   = getappdata(0, 'root2');
+        time        = handles.time;
+        potential   = handles.root2;
         threshold = str2double(get(handles.thresh_root2_edit, 'String'));
         % Try-catch block determines if rootOnset2 and rootOffset2 already
         % exist within the GUI handle structure. If they do, manual mode
@@ -116,8 +116,8 @@ switch identity
             baseline = handles.baseline3;
         end
         % Gets the time, potential, threshold.
-        time        = getappdata(0, 'time');
-        potential   = getappdata(0, 'root3');
+        time        = handles.time;
+        potential   = handles.root3;
         threshold = str2double(get(handles.thresh_root3_edit, 'String'));
         % Try-catch block determines if rootOnset3 and rootOffset3 already
         % exist within the GUI handle structure. If they do, manual mode

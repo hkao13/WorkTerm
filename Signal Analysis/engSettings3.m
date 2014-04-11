@@ -132,6 +132,7 @@ function ok_button_Callback(hObject, eventdata, handles)
         (0, 'burst3'  , str2double(get(handles.burst_thresh_edit , 'String')));
     setappdata...
         (0, 'percent3', str2double(get(handles.del_percent_edit  , 'String')));
+    close(handles.engSettings);
 end
 
 % --- Executes on button press in default_button.

@@ -1,4 +1,4 @@
-function smoothhist2D(X,lambda,nbins,outliercutoff,plottype)
+function smoothhist2D(X, limits, lambda,nbins,outliercutoff,plottype)
 % SMOOTHHIST2D Plot a smoothed histogram of bivariate data.
 %   SMOOTHHIST2D(X,LAMBDA,NBINS) plots a smoothed histogram of the bivariate
 %   data in the N-by-2 matrix X.  Rows of X correspond to observations.  The
@@ -45,8 +45,10 @@ function smoothhist2D(X,lambda,nbins,outliercutoff,plottype)
 if nargin < 4 || isempty(outliercutoff), outliercutoff = .05; end
 if nargin < 5, plottype = 'image'; end
 
-minx = min(X,[],1);
-maxx = max(X,[],1);
+% minx = min(X,[],1);
+% maxx = max(X,[],1);
+minx = [limits(1), limits(3)];
+maxx = [limits(2), limits(4)];
 edges1 = linspace(minx(1), maxx(1), nbins(1)+1);
 ctrs1 = edges1(1:end-1) + .5*diff(edges1);
 edges1 = [-Inf edges1(2:end-1) Inf];

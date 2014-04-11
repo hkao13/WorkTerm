@@ -27,11 +27,11 @@ if (button == 1)
             ax = handles.axes3;
             % Gets the time, potential, threshold and the spike, trough, burst
             % settings.
-            time        = getappdata(0, 'time');
-            potential   = getappdata(0, 'cell');
-            spike       = getappdata(0, 'cellSpike');
-            trough      = getappdata(0, 'cellTrough');
-            burst       = getappdata(0, 'cellBurst');
+            time        = handles.time;
+            potential   = handles.cell;
+            spike       = handles.cellSpike;
+            trough      = handles.cellTrough;
+            burst       = handles.cellBurst;
             set(handles.thresh_cell_edit, 'String', y);
             handles.threshold0 = str2double(get(handles.thresh_cell_edit, 'String'));
             % Cell object being created.
@@ -85,14 +85,14 @@ if (button == 1)
             end
             % Gets the time, potential, threshold and the span, factor,
             % spike, trough, burst, percent settings.
-            time        = getappdata(0, 'time');
-            potential   = getappdata(0, 'root1');
-            span        = getappdata(0, 'span');
-            factor      = getappdata(0, 'factor');
-            spike       = getappdata(0, 'spike');
-            trough      = getappdata(0, 'trough');
-            burst       = getappdata(0, 'burst');
-            percent     = getappdata(0, 'percent');
+            time        = handles.time;
+            potential   = handles.root1;
+            span        = handles.span;
+            factor      = handles.factor;
+            spike       = handles.spike;
+            trough      = handles.trough;
+            burst       = handles.burst;
+            percent     = handles.percent;
             set(handles.thresh_root1_edit, 'String', y);
             handles.threshold1 = str2double(get(handles.thresh_root1_edit, 'String'));
             % Creates the root 1 object.
@@ -154,14 +154,14 @@ if (button == 1)
             end
             % Gets the time, potential, threshold and the span, factor,
             % spike, trough, burst, percent settings.
-            time        = getappdata(0, 'time');
-            potential   = getappdata(0, 'root2');
-            span        = getappdata(0, 'span');
-            factor      = getappdata(0, 'factor');
-            spike       = getappdata(0, 'spike2');
-            trough      = getappdata(0, 'trough2');
-            burst       = getappdata(0, 'burst2');
-            percent     = getappdata(0, 'percent2');
+            time        = handles.time;
+            potential   = handles.root2;
+            span        = handles.span;
+            factor      = handles.factor;
+            spike       = handles.spike2;
+            trough      = handles.trough2;
+            burst       = handles.burst2;
+            percent     = handles.percent2;
             set(handles.thresh_root2_edit, 'String', y);
             handles.threshold2 = str2double(get(handles.thresh_root2_edit, 'String'));
             % Creates the root 2 object.
@@ -223,14 +223,14 @@ if (button == 1)
             end
             % Gets the time, potential, threshold and the span, factor,
             % spike, trough, burst, percent settings.
-            time        = getappdata(0, 'time');
-            potential   = getappdata(0, 'root3');
-            span        = getappdata(0, 'span');
-            factor      = getappdata(0, 'factor');
-            spike       = getappdata(0, 'spike3');
-            trough      = getappdata(0, 'trough3');
-            burst       = getappdata(0, 'burst3');
-            percent     = getappdata(0, 'percent3');
+            time        = handles.time;
+            potential   = handles.root3;
+            span        = handles.span;
+            factor      = handles.factor;
+            spike       = handles.spike3;
+            trough      = handles.trough3;
+            burst       = handles.burst3;
+            percent     = handles.percent3;
             set(handles.thresh_root3_edit, 'String', y);
             handles.threshold3 = str2double(get(handles.thresh_root3_edit, 'String'));
             % Creates the root 3 object.

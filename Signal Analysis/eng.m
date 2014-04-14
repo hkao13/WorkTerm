@@ -274,7 +274,7 @@ function figure_polar_menu_Callback(hObject, eventdata, handles)
         % time into radians and finds the average of all the radian and the
         % radius.
         timeOnsetDiffArray(end) = [];
-        theta = (-2*pi*(timeOnsetDiffArray./referencePeriod)) + (pi/2);
+        theta = (-2*pi*(timeOnsetDiffArray ./ referencePeriod)) + (pi/2);
         radius = ones(size(theta));
         yBar = mean(sin(theta));
         xBar = mean(cos(theta));

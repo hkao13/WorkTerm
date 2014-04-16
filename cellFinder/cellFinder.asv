@@ -389,10 +389,7 @@ end
 % --------------------------------------------------------------------
 function invert_menu_Callback(hObject, eventdata, handles)
     if(isfield(handles, 'imgBW'))
-        handles.imgBW = imcomplement(handles.imgBW);
-        imshow(handles.imgBW);
-    end
-    guidata(hObject, handles)
+        
 end
 
 % --------------------------------------------------------------------

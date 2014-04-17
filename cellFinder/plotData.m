@@ -22,7 +22,7 @@ function varargout = plotData(varargin)
 
 % Edit the above text to modify the response to help plotData
 
-% Last Modified by GUIDE v2.5 08-Apr-2014 16:13:00
+% Last Modified by GUIDE v2.5 17-Apr-2014 10:17:28
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -103,6 +103,17 @@ function plot_button_Callback(hObject, eventdata, handles)
     xBin = str2double(get(handles.xbin_edit, 'String'));
     yBin = str2double(get(handles.ybin_edit, 'String'));
     nBin = [xBin yBin];
+    
+    xmin = str2double(get(handles.xmin_edit, 'String'));
+    xmax = str2double(get(handles.xmax_edit, 'String'));
+    ymin = str2double(get(handles.ymin_edit, 'String'));
+    ymax = str2double(get(handles.ymax_edit, 'String'));
+    
+    if (~isnan(xmin) && ~isnan(xmax) && ~isnan(ymin) && ~isnan(ymax))
+        lim = [xmin, xmax, ymin, ymax];
+    else
+        lim = 'auto';
+    end
 
     dataH = handles.data;
     if (get(handles.r_check, 'Value') == 0)
@@ -144,6 +155,7 @@ function plot_button_Callback(hObject, eventdata, handles)
     set(hFig1, 'Name', 'Centroids');
     hold on
     axis ij;
+    axis(lim);
     % For loop to plot data.
     for i = 1:numel(xx)
         x = xx(i);
@@ -176,7 +188,9 @@ function plot_button_Callback(hObject, eventdata, handles)
     xlabel('X-Axis');
     ylabel('Y-Axis');
     hold off
-    lim = axis;
+    if (strcmp(lim, 'auto'))
+        lim = axis;
+    end
         
     hFig2 = figure(102);
     set(hFig2, 'Name', 'Density Plot');
@@ -295,3 +309,46 @@ function gb_check_Callback(hObject, eventdata, handles)
 
 % --- Executes on button press in rgb_check.
 function rgb_check_Callback(hObject, eventdata, handles)
+
+
+
+function xmin_edit_Callback(hObject, eventdata, handles)
+
+
+% --- Executes during object creation, after setting all properties.
+function xmin_edit_CreateFcn(hObject, eventdata, handles)
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+
+
+
+function xmax_edit_Callback(hObject, eventdata, handles)
+
+
+% --- Executes during object creation, after setting all properties.
+function xmax_edit_CreateFcn(hObject, eventdata, handles)
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+
+
+
+function ymin_edit_Callback(hObject, eventdata, handles)
+
+
+% --- Executes during object creation, after setting all properties.
+function ymin_edit_CreateFcn(hObject, eventdata, handles)
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+
+
+
+function ymax_edit_Callback(hObject, eventdata, handles)
+
+% --- Executes during object creation, after setting all properties.
+function ymax_edit_CreateFcn(hObject, eventdata, handles)
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end

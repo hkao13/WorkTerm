@@ -389,6 +389,7 @@ end
 % --------------------------------------------------------------------
 function invert_menu_Callback(hObject, eventdata, handles)
     if(isfield(handles, 'imgBW'))
+        handles.img = imcomplement(handles.img);
         handles.imgBW = imcomplement(handles.imgBW);
         imshow(handles.imgBW);
     end
@@ -1050,6 +1051,11 @@ function count_button_Callback(hObject, eventdata, handles)
             fprintf('Block: %d\t-\tCell Count: %d\n', block(i).blockNumber, block(i).cellCount); 
         end
         fprintf('\n');
+        
+        for i = 1:numel(block);
+            fprintf('%d\n', block(i).cellCount)
+        end
+        fprintf('\n');
     end
     
     if(get(handles.red_radio, 'Value') == 1)
@@ -1136,6 +1142,12 @@ function [stats, block] = getCount(handles, image)
             fprintf('Block: %d\t-\tCell Count: %d\n', block(i).blockNumber, block(i).cellCount); 
         end
         fprintf('\n');
+        
+        for i = 1:numel(block);
+            fprintf('%d\n', block(i).cellCount)
+        end
+        fprintf('\n');
+        
     else
         block = NaN;
     end
@@ -1205,8 +1217,8 @@ end
 % --- Executes on button press in blue_button.
 function blue_button_Callback(hObject, eventdata, handles)
     if(isfield(handles, 'imgBlue'))
-        if(isfield(handles, 'doubleLabel'))
-            handles.imgBlue = handles.doubleLabel;
+        if(isfield(handles, 'doubleLabelB'))
+            handles.imgBlue = handles.doubleLabelB;
         end
         try
             delete(handles.blueLayer);
@@ -1241,8 +1253,8 @@ end
 % --- Executes on button press in green_button.
 function green_button_Callback(hObject, eventdata, handles)
     if(isfield(handles, 'imgGreen'))
-        if(isfield(handles, 'doubleLabel'))
-            handles.imgGreen = handles.doubleLabel;
+        if(isfield(handles, 'doubleLabelG'))
+            handles.imgGreen = handles.doubleLabelG;
         end
         try
             delete(handles.greenLayer);
@@ -1276,8 +1288,8 @@ end
 % --- Executes on button press in red_button.
 function red_button_Callback(hObject, eventdata, handles)
     if(isfield(handles, 'imgRed'))
-        if(isfield(handles, 'doubleLabel'))
-            handles.imgRed = handles.doubleLabel;
+        if(isfield(handles, 'doubleLabelR'))
+            handles.imgRed = handles.doubleLabelR;
         end
         try
             delete(handles.redLayer);
@@ -1311,6 +1323,13 @@ end
 % --- Executes on button press in blue_green_button.
 function blue_green_button_Callback(hObject, eventdata, handles)
     if (isfield(handles, 'imgBlueGreen'))
+        if(isfield(handles, 'doubleLabelBG'))
+            handles.imgBlueGreen = handles.doubleLabelBG;
+        end
+        try
+            delete(handles.blueGreenLayer);
+        catch err
+        end
         toggle = get(handles.blue_green_button, 'Value');
         if (toggle == get(handles.blue_green_button, 'Max'))
             BG = cat(3, zeros(size(handles.imgBlueGreen)), ones(size(handles.imgBlueGreen)), ones(size(handles.imgBlueGreen)));
@@ -1340,6 +1359,13 @@ end
 % --- Executes on button press in blue_red_button.
 function blue_red_button_Callback(hObject, eventdata, handles)
     if(isfield(handles, 'imgBlueRed'))
+        if(isfield(handles, 'doubleLabelBR'))
+            handles.imgBlueRed = handles.doubleLabelBR;
+        end
+        try
+            delete(handles.blueRedLayer);
+        catch err
+        end
         toggle = get(handles.blue_red_button, 'Value');
         if (toggle == get(handles.blue_red_button, 'Max'))
             BR = cat(3, ones(size(handles.imgBlueRed)), zeros(size(handles.imgBlueRed)), ones(size(handles.imgBlueRed)));
@@ -1368,6 +1394,13 @@ end
 % --- Executes on button press in green_red_button.
 function green_red_button_Callback(hObject, eventdata, handles)
     if(isfield(handles, 'imgGreenRed'))
+        if(isfield(handles, 'doubleLabelGR'))
+            handles.imgGreenRed = handles.doubleLabelGR;
+        end
+        try
+            delete(handles.greenRedLayer);
+        catch err
+        end
         toggle = get(handles.green_red_button, 'Value');
         if (toggle == get(handles.green_red_button, 'Max'))
             GR = cat(3, ones(size(handles.imgGreenRed)), ones(size(handles.imgGreenRed)), zeros(size(handles.imgGreenRed)));
@@ -1396,6 +1429,13 @@ end
 % --- Executes on button press in blue_green_red_button.
 function blue_green_red_button_Callback(hObject, eventdata, handles)
     if(isfield(handles, 'imgBlueGreenRed'))
+        if(isfield(handles, 'doubleLabelBGR'))
+            handles.imgBlueGreenRed = handles.doubleLabelBGR;
+        end
+        try
+            delete(handles.blueGreenRedLayer);
+        catch err
+        end
         toggle = get(handles.blue_green_red_button, 'Value');
         if (toggle == get(handles.blue_green_red_button, 'Max'))
             BGR = cat(3, zeros(size(handles.imgBlueGreenRed)), zeros(size(handles.imgBlueGreenRed)), zeros(size(handles.imgBlueGreenRed)));
@@ -1727,7 +1767,7 @@ function doubleLabel_slider_Callback(hObject, eventdata, handles)
                 handles.blueLayer = imshow(blue);
                 set(handles.blueLayer, 'AlphaData', image2);
                 hold off
-                handles.doubleLabel = image2;
+                handles.doubleLabelB = image2;
                 guidata(hObject, handles)
                 
             case {'green'}
@@ -1746,7 +1786,7 @@ function doubleLabel_slider_Callback(hObject, eventdata, handles)
                 handles.greenLayer = imshow(green);
                 set(handles.greenLayer, 'AlphaData', image2);
                 hold off
-                handles.doubleLabel = image2;
+                handles.doubleLabelG = image2;
                 guidata(hObject, handles)
                    
             case {'red'}
@@ -1765,7 +1805,7 @@ function doubleLabel_slider_Callback(hObject, eventdata, handles)
                 handles.redLayer = imshow(red);
                 set(handles.redLayer, 'AlphaData', image2);
                 hold off
-                handles.doubleLabel = image2;
+                handles.doubleLabelR = image2;
                 guidata(hObject, handles)
                 
             case {'blueGreen'}
@@ -1784,7 +1824,7 @@ function doubleLabel_slider_Callback(hObject, eventdata, handles)
                 handles.blueGreenLayer = imshow(BG);
                 set(handles.blueGreenLayer, 'AlphaData', image2);
                 hold off
-                handles.doubleLabel = image2;
+                handles.doubleLabelBG = image2;
                 guidata(hObject, handles)
                 
             case {'blueRed'}
@@ -1803,7 +1843,7 @@ function doubleLabel_slider_Callback(hObject, eventdata, handles)
                 handles.blueRedLayer = imshow(BR);
                 set(handles.blueRedLayer, 'AlphaData', image2);
                 hold off
-                handles.doubleLabel = image2;
+                handles.doubleLabelBR = image2;
                 guidata(hObject, handles)
                 
             case {'greenRed'}
@@ -1822,7 +1862,7 @@ function doubleLabel_slider_Callback(hObject, eventdata, handles)
                 handles.greenRedLayer = imshow(GR);
                 set(handles.greenRedLayer, 'AlphaData', image2);
                 hold off
-                handles.doubleLabel = image2;
+                handles.doubleLabelGR = image2;
                 guidata(hObject, handles)
                 
             case {'blueGreenRed'}
@@ -1841,7 +1881,7 @@ function doubleLabel_slider_Callback(hObject, eventdata, handles)
                 handles.blueGreenRedLayer = imshow(BGR);
                 set(handles.blueGreenRedLayer, 'AlphaData', image2);
                 hold off
-                handles.doubleLabel = image2;
+                handles.doubleLabelBGR = image2;
                 guidata(hObject, handles);
     end
     

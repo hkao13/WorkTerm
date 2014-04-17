@@ -78,7 +78,8 @@ if outliercutoff > 0
 end
 
 nc = 256;
-colormap(hot(nc));
+% colormap(hot(nc));
+colormap(winter);
 switch plottype
 case 'surf'
     surf(ctrs1,ctrs2,F,'edgealpha',0);

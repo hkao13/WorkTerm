@@ -431,17 +431,15 @@ function stuff_menu_Callback(hObject, eventdata, handles)
     set(handles.findCellsControls, 'Enable', 'off', 'Visible', 'off');
     if(isfield(handles, 'imgBlue') && isfield(handles, 'imgGreen'))
         handles.imgBlueGreen = handles.imgBlue & handles.imgGreen;
-        [stats, block] = getCount(handles, handles.imgBlue);
         black = cat(3, zeros(size(handles.imgBlue)), zeros(size(handles.imgBlue)), zeros(size(handles.imgBlue)));
     end
     if(isfield(handles, 'imgBlue') && isfield(handles, 'imgRed'))
         handles.imgBlueRed = handles.imgBlue & handles.imgRed;
-        [stats, block] = getCount(handles, handles.imgRed);
         black = cat(3, zeros(size(handles.imgRed)), zeros(size(handles.imgRed)), zeros(size(handles.imgRed)));
     end
     if(isfield(handles, 'imgGreen') && isfield(handles, 'imgRed'))
         handles.imgGreenRed = handles.imgGreen & handles.imgRed;
-        [stats, block] = getCount(handles, handles.imgGreen);
+
     end
     if(isfield(handles, 'imgBlue') && isfield(handles, 'imgGreen') && isfield(handles, 'imgRed'))
         handles.imgBlueGreenRed = handles.imgBlue & handles.imgGreen & handles.imgRed;
@@ -450,12 +448,8 @@ function stuff_menu_Callback(hObject, eventdata, handles)
     
     clc;
     
-    if (~isnan(block))
-        for i = 1:numel(block);
-            fprintf('Block: %d\n', block(i).blockNumber); 
-        end
-    fprintf('\n');
-    end
+    fprintf('Blocks are counted left to right, top to bottom.\nEx.\nBlock 1\nBlock 2\nBlock 3\n...\n');
+
     imshow(black);
     guidata(hObject, handles);
 end
